@@ -93,21 +93,36 @@ const firebaseConfig = {
                 document.getElementById('savedTextLines').innerHTML = '';
 
                 if(savedTextLines) {
+                    /*
                     //If there are saved text lines, parse the JSON and display each line
                     savedTextLines = JSON.parse(savedTextLines);
 
                     //OLD WORKING WITHOUT TIME
-                    /*savedTextLines.forEach(function(line) {
+                    savedTextLines.forEach(function(line) {
                         var lineElement = document.createElement('p');
                         lineElement.textContent = line;
                         document.getElementById('savedTextLines').appendChild(lineElement);
-                    }); */
+                    }); 
 
                     for(var i = savedTextLines.length - 1; i >= 0; i--) {
                         var lineElement = document.createElement('p');
                         lineElement.textContent = '[' + savedTextLines[i].time + ']:   ' + savedTextLines[i].text;
                         document.getElementById('savedTextLines').appendChild(lineElement);
                     }
+                    */
+
+                    document.getElementById('savedLines').innerHTML = '';
+
+            // Retrieve messages from Firebase
+            messagesRef.once('value', function(snapshot) {
+                snapshot.forEach(function(childSnapshot) {
+                    var message = childSnapshot.val();
+
+                    var lineElement = document.createElement('p');
+                    lineElement.textContent = message.text + ' (' + message.time + ')';
+                    document.getElementById('savedLines').appendChild(lineElement);
+                });
+            });
 
                 }
             }
