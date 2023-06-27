@@ -23,7 +23,7 @@
 <body>
 
     <h2>THE TEXT PAGE</h2>
-    <h5>(in development attempt like 45)</h5>
+    <h5>(in development attempt like 2000 BUT WOKRING?!)</h5>
 
     <a href="https://chairfansltd.online/" style="color:rgb(255, 203, 59)">Go back to Main Page</a>
     <br>
@@ -65,19 +65,19 @@
         }
 
         function displayLines() {
-            var savedTextLines = document.getElementById('savedTextLines');
-            savedTextLines.innerHTML = '';
+  var savedTextLines = document.getElementById('savedTextLines');
+  savedTextLines.innerHTML = '';
 
-            messagesRef.once('value', function (snapshot) {
-                snapshot.forEach(function (childSnapshot) {
-                    var message = childSnapshot.val();
+  messagesRef.once('value', function(snapshot) {
+    snapshot.forEach(function(childSnapshot) {
+      var message = childSnapshot.val();
 
-                    var lineElement = document.createElement('p');
-                    lineElement.textContent = message.text + ' (' + message.time + ')';
-                    savedTextLines.appendChild(lineElement);
-                });
-            });
-        }
+      var lineElement = document.createElement('p');
+      lineElement.textContent = message.text + ' (' + message.time + ')';
+      savedTextLines.prepend(lineElement); // Prepend the new message
+    });
+  });
+}
 
         displayLines();
     </script>
