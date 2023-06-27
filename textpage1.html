@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html>
+
+    <head>
+        <title>Text Page1</title> 
+        <style>
+            #savedTextLines {
+                line-height: 0.1;
+            }
+
+            #savedTextLines p {
+                margin-bottom: 5px;
+            }
+
+            body {background-color:rgb(48, 8, 112); text-align: center; color:white;}
+        </style>   
+    </head>
+
+    <body>
+
+        <h2>THE TEXT PAGE</h2> <h5>(in development)</h5>
+
+        <a href="https://chairfansltd.online/" style="color:rgb(255, 203, 59)">Go back to Main Page</a>
+        <br>
+        <br>
+
+        <input type="text" id="inputBox" placeholder="put some text here i guess">
+        <button onClick="saveText()"> Submit Text </button>
+        <div id="savedTextLines"></div>
+
+
+        <script>
+            function saveText(){
+                //Retrieve text
+                var text = document.getElementById('inputBox').value;
+
+                //Retrieve existing lines
+                var savedTextLines = localStorage.getItem('lines');
+
+                //Get the current time
+                var currentTime = new Date().toLocaleTimeString();
+                
+                if (savedTextLines) {
+                    //If there are already existing lines, parse the JSON and then add the new line
+                    savedTextLines = JSON.parse(savedTextLines);
+
+                    //Old code line
+                    //savedTextLines.push(text);
+
+                    savedTextLines.push({text: text, time: currentTime}); //Adds new line at beginning of array
+                } else {
+                    //If no existing lines, create a new array with the current line
+                    savedTextLines = [{text: text, time: currentTime}];
+                }
+
+                //Save updated lines
+                localStorage.setItem('lines', JSON.stringify(savedTextLines));
+
+                //Display the lines
+                displayLines();
+            }
+
+            function displayLines() {
+                //Retrieve the saved lines from localStorage
+                var savedTextLines = localStorage.getItem('lines');
+                
+                //Clear container element
+                document.getElementById('savedTextLines').innerHTML = '';
+
+                if(savedTextLines) {
+                    //If there are saved text lines, parse the JSON and display each line
+                    savedTextLines = JSON.parse(savedTextLines);
+
+                    //OLD WORKING WITHOUT TIME
+                    /*savedTextLines.forEach(function(line) {
+                        var lineElement = document.createElement('p');
+                        lineElement.textContent = line;
+                        document.getElementById('savedTextLines').appendChild(lineElement);
+                    }); */
+
+                    for(var i = savedTextLines.length - 1; i >= 0; i--) {
+                        var lineElement = document.createElement('p');
+                        lineElement.textContent = '[' + savedTextLines[i].time + ']:   ' + savedTextLines[i].text;
+                        document.getElementById('savedTextLines').appendChild(lineElement);
+                    }
+
+                }
+            }
+
+            //Call displayLines() when the page loads to show existing lines
+            displayLines();
+
+        </script>
+
+
+    </body>
+</html>
