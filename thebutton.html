@@ -1,0 +1,67 @@
+<!-- button.html -->
+<!DOCTYPE html>
+<html>
+<head>
+  <title>THE BUTTON</title>
+
+  <style>
+    body {
+            background-color: rgb(146, 64, 10);
+            text-align: center;
+            color: white;
+        }
+  </style>
+
+  <!-- Include the Firebase SDK scripts -->
+  <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
+</head>
+<body>
+  <h2>THE BUTTON</h2>
+
+        <a href="https://chairfansltd.online/" style="color:rgb(255, 203, 59)">Go back to Main Page</a>
+        <br>
+        <a href="https://chairfansltd.online/textpage1" style="color:rgb(255, 203, 59)">To The Chat Room</a>
+        <br>
+        <br>
+        <br>
+
+  <button id="pressButton" style="width:200px; height:200px">THE BUTTON</button>
+  <p>Current Score: <span id="scorePlaceholder"></span></p>
+
+  <script>
+    var firebaseConfig = {
+            apiKey: "AIzaSyByOJEl2Q5NX5OsuZ2yobTUXlElx0VSooY",
+            authDomain: "textpage1-chair.firebaseapp.com",
+            databaseURL: "https://textpage1-chair-default-rtdb.firebaseio.com",
+            projectId: "textpage1-chair",
+            storageBucket: "textpage1-chair.appspot.com",
+            messagingSenderId: "498007060580",
+            appId: "1:498007060580:web:a4fe4e2dc5d2bfb68f2f71",
+            measurementId: "G-Y23K3YNV76"
+        };
+
+    // Initialize Firebase
+    firebase.initializeApp(firebaseConfig);
+
+    var database = firebase.database();
+    var scoreRef = database.ref("score");
+
+    // Listen for button press
+    var pressButton = document.getElementById('pressButton');
+    pressButton.addEventListener('click', function() {
+      scoreRef.transaction(function(currentScore) {
+        // Increment the score by 1
+        return (currentScore || 0) + 1;
+      });
+    });
+
+    // Update the score placeholder
+    var scorePlaceholder = document.getElementById('scorePlaceholder');
+    scoreRef.on('value', function(snapshot) {
+      var score = snapshot.val();
+      scorePlaceholder.textContent = score || 0;
+    });
+  </script>
+</body>
+</html>

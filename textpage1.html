@@ -2,7 +2,7 @@
 <html>
 
 <head>
-    <title>Text Page1</title>
+    <title>Chair Fans Chat Room</title>
     <style>
         #savedTextLines {
             line-height: 0.1;
@@ -26,6 +26,7 @@
     <h5>(in development attempt like 2000 BUT WOKRING?!)</h5>
 
     <a href="https://chairfansltd.online/" style="color:rgb(255, 203, 59)">Go back to Main Page</a>
+    <a href="https://chairfansltd.online/thebutton" style="color:rgb(255, 203, 59)">To THE BUTTON</a>
     <br>
     <br>
 
@@ -54,6 +55,7 @@
 
         var database = firebase.database();
         var messagesRef = database.ref("messages");
+        
 
         function saveText() {
             var text = document.getElementById('inputBox').value;
