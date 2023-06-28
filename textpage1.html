@@ -38,6 +38,7 @@
     <h5 style="text-align: center">(In Development)</h5>
     <p id="loggedInAccount"></p>
     <hr>
+      
 
     <style>
         .vl {
@@ -68,6 +69,30 @@
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
 
     <script>
+
+
+
+
+
+var loggedInUsername = ''; // Variable to store the logged-in username
+
+  // Update user account information
+  function updateUserAccount() {
+    var currentUser = firebase.auth().currentUser;
+
+    if (currentUser) {
+      loggedInUsername = currentUser.displayName || 'Unknown User'; // Store the logged-in username
+      document.getElementById('userAccount').textContent = 'Logged in as: ' + loggedInUsername;
+    } else {
+      loggedInUsername = ''; // Reset the variable if the user is not logged in
+      document.getElementById('userAccount').textContent = 'Not logged in';
+    }
+  }
+
+
+
+
+
         var firebaseConfig = {
             apiKey: "AIzaSyByOJEl2Q5NX5OsuZ2yobTUXlElx0VSooY",
     authDomain: "textpage1-chair.firebaseapp.com",
@@ -85,51 +110,103 @@
         var database = firebase.database();
         var messagesRef = database.ref("messages");
 
-        function saveText() {
-  var text = document.getElementById('inputBox').value;
-  var currentTime = new Date().toLocaleTimeString();
-  var currentUser = firebase.auth().currentUser; // Get the current user
+
+        var currentUsername = ''; // Variable to store the current username
+
+// Update user account information
+function updateUserAccount() {
+  var currentUser = firebase.auth().currentUser;
 
   if (currentUser) {
-    // User is signed in
-    var displayName = currentUser.displayName; // Get the user's display name
-
-    // Retrieve messages to Firebase
-    messagesRef.push({ text: text, time: currentTime, user: displayName });
+    currentUsername = currentUser.displayName || ''; // Store the display name in the variable
+    document.getElementById('userAccount').textContent = 'Logged in as: ' + currentUsername;
   } else {
-    // User is not signed in, handle appropriately (e.g., display an error message)
-    console.log('User is not signed in. Message submission not allowed.');
-    alert("Please sign in to send a message.");
+    currentUsername = ''; // Reset the variable if the user is not logged in
+    document.getElementById('userAccount').textContent = 'Not logged in';
   }
 }
 
 
 
-function displayLines() {
-  // ...
+function saveText() {
+    var text = document.getElementById('inputBox').value;
+    var currentTime = new Date().toLocaleTimeString();
+    var currentUser = firebase.auth().currentUser;
 
-  // Retrieve messages from Firebase in reverse order
-  messagesRef.once('value', function(snapshot) {
-    var messages = [];
-    snapshot.forEach(function(childSnapshot) {
-      messages.unshift(childSnapshot.val()); // Add messages to the beginning of the array
-    });
+    if (currentUser) {
+      currentUser.getIdTokenResult()
+        .then(function(idTokenResult) {
+          // User is signed in
+          var displayName = idTokenResult.claims.name || 'Unknown User';
 
-    messages.forEach(function(message) {
-      var lineElement = document.createElement('p');
-      var username = (message.user && message.user.displayName) || 'Unknown User'; // Retrieve display name from user object
-      lineElement.textContent = '[' + message.time + '][' + username + ']: ' + message.text;
-      document.getElementById('savedTextLines').appendChild(lineElement);
-    });
+          // Create the message string
+          var messageString = '[' + currentTime + '][' + displayName + ']: ' + text;
+
+          // Store the message string in Firebase
+          var newMessageRef = messagesRef.push(); // Generate a new unique key for the message
+          newMessageRef.set(messageString)
+            .then(function() {
+              // Insert the new message at the top
+              var lineElement = document.createElement('p');
+              lineElement.textContent = messageString;
+              var savedTextLines = document.getElementById('savedTextLines');
+              savedTextLines.insertBefore(lineElement, savedTextLines.firstChild);
+
+              // Clear the input box after submission
+              document.getElementById('inputBox').value = '';
+            })
+            .catch(function(error) {
+              console.error('Failed to save message:', error);
+              alert("An error occurred while sending the message.");
+            });
+        })
+        .catch(function(error) {
+          console.error('Failed to get ID token result:', error);
+          alert("An error occurred while sending the message.");
+        });
+    } else {
+      // User is not signed in, handle appropriately (e.g., display an error message)
+      console.log('User is not signed in. Message submission not allowed.');
+      alert("Please sign in to send a message.");
+    }
+  }
+
+
+
+// Listen for authentication state changes
+firebase.auth().onAuthStateChanged(function(user) {
+    updateUserAccount();
+
+    if (user) {
+      displayLines(); // Fetch and display the chat history
+    }
   });
 
-  // ...
-}
+  function displayLines() {
+    // Retrieve messages from Firebase
+    messagesRef.once('value', function(snapshot) {
+      var messages = [];
+      snapshot.forEach(function(childSnapshot) {
+        messages.unshift(childSnapshot.val()); // Add messages to the beginning of the array
+      });
+
+      // Clear the existing messages
+      var savedTextLines = document.getElementById('savedTextLines');
+      savedTextLines.innerHTML = '';
+
+      // Add the messages to the chat window
+      messages.forEach(function(message) {
+        var lineElement = document.createElement('p');
+        lineElement.textContent = message;
+        savedTextLines.appendChild(lineElement);
+      });
+    });
+  }
 
 
 
 
-        displayLines();
+        //displayLines();
     </script>
 
 
