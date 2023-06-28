@@ -58,6 +58,9 @@
     <a href="https://chairfansltd.online/thebutton" style="color:rgb(255, 203, 59); text-align: center">To THE BUTTON</a>
     <br>
     <br>
+    <p>
+        Version: 0.1.0
+    </p>
 
     <input type="text" id="inputBox" placeholder="put some text here i guess">
     <button onClick="saveText()"> Submit Text </button>
@@ -184,6 +187,20 @@ firebase.auth().onAuthStateChanged(function(user) {
 
   function displayLines() {
     // Retrieve messages from Firebase
+
+
+    //Refresh messages constantly
+    messagesRef.on('child_added', function(snapshot) {
+    var message = snapshot.val();
+
+    var lineElement = document.createElement('p');
+    lineElement.textContent = message;
+
+    var savedTextLines = document.getElementById('savedTextLines');
+    savedTextLines.insertBefore(lineElement, savedTextLines.firstChild);
+  });
+
+
     messagesRef.once('value', function(snapshot) {
       var messages = [];
       snapshot.forEach(function(childSnapshot) {
