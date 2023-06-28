@@ -6,10 +6,26 @@
     </style>
 
     <head>
+
+        <title>ChairFans</title>
+
+        <!-- CSS styles -->
+<style>
+    /* ... existing styles ... */
+
+    #userAccount {
+        position: absolute;
+        top: 10px;
+        right: 10px;
+        font-size: 14px;
+    }
+</style>
+
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1">
     </head>
     <body style="background-color:rgb(25, 73, 78)">
+        
         <h1 style="color:white">THIS IS <b style="color:aquamarine">THE WEBSITE OF ALL TIME</b></h1>
         <h4 style="color:white">Proof of Ownership by the "Gameing©" discord server.</h4>
             <p>
@@ -34,5 +50,58 @@
             <br>
             <br>
             <h5>Disclaimer: This website is <b style="color:aquamarine">under construction</b></h1>
+
+            </script>
+
+
+            <!-- User Account -->
+            <div id="userAccount"></div>
+            
+            <!-- ... existing code ... -->    <!-- Add the Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
+
+    <script>
+        var firebaseConfig = {
+            apiKey: "AIzaSyByOJEl2Q5NX5OsuZ2yobTUXlElx0VSooY",
+    authDomain: "textpage1-chair.firebaseapp.com",
+    databaseURL: "https://textpage1-chair-default-rtdb.firebaseio.com",
+    projectId: "textpage1-chair",
+    storageBucket: "textpage1-chair.appspot.com",
+    messagingSenderId: "498007060580",
+    appId: "1:498007060580:web:a4fe4e2dc5d2bfb68f2f71",
+    measurementId: "G-Y23K3YNV76"
+        };
+
+        // Initialize Firebase
+        firebase.initializeApp(firebaseConfig);
+
+        </script>
+            
+            
+            <script>
+                // ... existing JavaScript code ...
+            
+                // Update user account information
+                function updateUserAccount() {
+                    var currentUser = firebase.auth().currentUser;
+            
+                    if (currentUser) {
+                        var displayName = currentUser.displayName;
+                        document.getElementById('userAccount').textContent = 'Logged in as: ' + displayName;
+                    } else {
+                        document.getElementById('userAccount').textContent = 'Not logged in';
+                    }
+                }
+            
+                // Listen for authentication state changes
+                firebase.auth().onAuthStateChanged(function(user) {
+                    updateUserAccount();
+                });
+            </script>
+
+            
+
     </body>
 </html>
