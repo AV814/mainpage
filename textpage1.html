@@ -33,6 +33,12 @@
         }
         </style>
 
+        <t>Don't have a ChairFans Account? </t>
+    <a href="https://chairfansltd.online/create-account" style="color:rgb(255, 203, 59); text-align: center">Create One!</a>
+    <br>
+    <t>Already have a ChairFans Account? If not signed in already, </t>
+    <a href="https://chairfansltd.online/create-account" style="color:rgb(255, 203, 59); text-align: center">Sign In!</a>
+    <br>
     <a href="https://chairfansltd.online/" style="color:rgb(255, 203, 59); text-align: center">Go back to Main Page</a>
     <br>
     <a href="https://chairfansltd.online/thebutton" style="color:rgb(255, 203, 59); text-align: center">To THE BUTTON</a>
@@ -67,28 +73,41 @@
         
 
         function saveText() {
-            var text = document.getElementById('inputBox').value;
-            var currentTime = new Date().toLocaleTimeString();
+  var text = document.getElementById('inputBox').value;
+  var currentTime = new Date().toLocaleTimeString();
+  var currentUser = firebase.auth().currentUser; // Get the current user
 
-            messagesRef.push({ text: text, time: currentTime });
+  if (currentUser) {
+    // User is signed in
+    var displayName = currentUser.displayName; // Get the user's display name
 
-            displayLines();
-        }
+    // Retrieve messages to Firebase
+    messagesRef.push({ text: text, time: currentTime, user: displayName });
+  } else {
+    // User is not signed in, handle appropriately (e.g., display an error message)
+    console.log('User is not signed in. Message submission not allowed.');
+    return;
+  }
 
-        function displayLines() {
-  var savedTextLines = document.getElementById('savedTextLines');
-  savedTextLines.innerHTML = '';
+  // ... rest of the code
+}
 
+function displayLines() {
+  // ... previous code
+
+  // Retrieve messages from Firebase
   messagesRef.once('value', function(snapshot) {
     snapshot.forEach(function(childSnapshot) {
       var message = childSnapshot.val();
-
       var lineElement = document.createElement('p');
-      lineElement.textContent = message.text + ' (' + message.time + ')';
-      savedTextLines.prepend(lineElement); // Prepend the new message
+      lineElement.textContent = '[' + message.time + '][' + message.user + ']: ' + message.text;
+      document.getElementById('savedTextLines').appendChild(lineElement);
     });
   });
+
+  // ... rest of the code
 }
+
 
         displayLines();
     </script>
