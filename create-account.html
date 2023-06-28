@@ -29,6 +29,23 @@
           // Registration successful
           var user = userCredential.user;
           console.log('Registration successful:', user);
+
+          // After creating a new user account
+// After creating a new user account
+var user = firebase.auth().currentUser;
+
+var username = prompt("Enter a username");
+if (username) {
+  user.updateProfile({
+    displayName: username
+  }).then(function() {
+    console.log("Username updated successfully");
+  }).catch(function(error) {
+    console.log("Error updating username:", error);
+  });
+}
+
+
           // Redirect to the sign-in page
           window.location.href = 'sign-in.html';
         })

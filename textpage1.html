@@ -3,6 +3,19 @@
 
 <head>
     <title>Chair Fans Chat Room</title>
+
+<!-- CSS styles -->
+<style>
+    /* ... existing styles ... */
+
+    #userAccount {
+        position: absolute;
+        top: 10px;
+        right: 10px;
+        font-size: 14px;
+    }
+</style>
+
     <style>
         #savedTextLines {
             line-height: 0.5;
@@ -73,29 +86,79 @@
         var messagesRef = database.ref("messages");
 
         function saveText() {
-            var text = document.getElementById('inputBox').value;
-            var currentTime = new Date().toLocaleTimeString();
-            var currentUser = firebase.auth().currentUser; // Get the current user
+  var text = document.getElementById('inputBox').value;
+  var currentTime = new Date().toLocaleTimeString();
+  var currentUser = firebase.auth().currentUser; // Get the current user
 
-            if (currentUser) {
-                // User is signed in
-                var displayName = currentUser.displayName; // Get the user's display name
+  if (currentUser) {
+    // User is signed in
+    var displayName = currentUser.displayName; // Get the user's display name
 
-                // Retrieve messages to Firebase
-                messagesRef.push({ text: text, time: currentTime, user: displayName });
-            } else {
-                // User is not signed in, handle appropriately (e.g., display an error message)
-                console.log('User is not signed in. Message submission not allowed.');
-                alert("Please sign in to send a message.");
-            }
-        }
+    // Retrieve messages to Firebase
+    messagesRef.push({ text: text, time: currentTime, user: displayName });
+  } else {
+    // User is not signed in, handle appropriately (e.g., display an error message)
+    console.log('User is not signed in. Message submission not allowed.');
+    alert("Please sign in to send a message.");
+  }
+}
 
-        function displayLines() {
-            // ... previous code
-        }
+
+
+function displayLines() {
+  // ...
+
+  // Retrieve messages from Firebase in reverse order
+  messagesRef.once('value', function(snapshot) {
+    var messages = [];
+    snapshot.forEach(function(childSnapshot) {
+      messages.unshift(childSnapshot.val()); // Add messages to the beginning of the array
+    });
+
+    messages.forEach(function(message) {
+      var lineElement = document.createElement('p');
+      var username = (message.user && message.user.displayName) || 'Unknown User'; // Retrieve display name from user object
+      lineElement.textContent = '[' + message.time + '][' + username + ']: ' + message.text;
+      document.getElementById('savedTextLines').appendChild(lineElement);
+    });
+  });
+
+  // ...
+}
+
+
+
 
         displayLines();
     </script>
+
+
+<!-- User Account -->
+<div id="userAccount"></div>
+
+<!-- ... existing code ... -->
+
+<script>
+    // ... existing JavaScript code ...
+
+    // Update user account information
+    function updateUserAccount() {
+        var currentUser = firebase.auth().currentUser;
+
+        if (currentUser) {
+            var displayName = currentUser.displayName;
+            document.getElementById('userAccount').textContent = 'Logged in as: ' + displayName;
+        } else {
+            document.getElementById('userAccount').textContent = 'Not logged in';
+        }
+    }
+
+    // Listen for authentication state changes
+    firebase.auth().onAuthStateChanged(function(user) {
+        updateUserAccount();
+    });
+</script>
+
 </body>
 
 </html>
