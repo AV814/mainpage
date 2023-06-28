@@ -21,19 +21,19 @@
 </head>
 
 <body>
-
     <h2 style="text-align: center">THE TEXT PAGE</h2>
     <h5 style="text-align: center">(In Development)</h5>
+    <p id="loggedInAccount"></p>
     <hr>
 
     <style>
         .vl {
-          border-left: 6px solid green;
-          height: 500px;
+            border-left: 6px solid green;
+            height: 500px;
         }
-        </style>
+    </style>
 
-        <t>Don't have a ChairFans Account? </t>
+    <t>Don't have a ChairFans Account? </t>
     <a href="https://chairfansltd.online/create-account" style="color:rgb(255, 203, 59); text-align: center">Create One!</a>
     <br>
     <t>Already have a ChairFans Account? If not signed in already, </t>
@@ -52,17 +52,18 @@
     <!-- Add the Firebase SDK -->
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
 
     <script>
         var firebaseConfig = {
             apiKey: "AIzaSyByOJEl2Q5NX5OsuZ2yobTUXlElx0VSooY",
-            authDomain: "textpage1-chair.firebaseapp.com",
-            databaseURL: "https://textpage1-chair-default-rtdb.firebaseio.com",
-            projectId: "textpage1-chair",
-            storageBucket: "textpage1-chair.appspot.com",
-            messagingSenderId: "498007060580",
-            appId: "1:498007060580:web:a4fe4e2dc5d2bfb68f2f71",
-            measurementId: "G-Y23K3YNV76"
+    authDomain: "textpage1-chair.firebaseapp.com",
+    databaseURL: "https://textpage1-chair-default-rtdb.firebaseio.com",
+    projectId: "textpage1-chair",
+    storageBucket: "textpage1-chair.appspot.com",
+    messagingSenderId: "498007060580",
+    appId: "1:498007060580:web:a4fe4e2dc5d2bfb68f2f71",
+    measurementId: "G-Y23K3YNV76"
         };
 
         // Initialize Firebase
@@ -70,44 +71,28 @@
 
         var database = firebase.database();
         var messagesRef = database.ref("messages");
-        
 
         function saveText() {
-  var text = document.getElementById('inputBox').value;
-  var currentTime = new Date().toLocaleTimeString();
-  var currentUser = firebase.auth().currentUser; // Get the current user
+            var text = document.getElementById('inputBox').value;
+            var currentTime = new Date().toLocaleTimeString();
+            var currentUser = firebase.auth().currentUser; // Get the current user
 
-  if (currentUser) {
-    // User is signed in
-    var displayName = currentUser.displayName; // Get the user's display name
+            if (currentUser) {
+                // User is signed in
+                var displayName = currentUser.displayName; // Get the user's display name
 
-    // Retrieve messages to Firebase
-    messagesRef.push({ text: text, time: currentTime, user: displayName });
-  } else {
-    // User is not signed in, handle appropriately (e.g., display an error message)
-    console.log('User is not signed in. Message submission not allowed.');
-    return;
-  }
+                // Retrieve messages to Firebase
+                messagesRef.push({ text: text, time: currentTime, user: displayName });
+            } else {
+                // User is not signed in, handle appropriately (e.g., display an error message)
+                console.log('User is not signed in. Message submission not allowed.');
+                alert("Please sign in to send a message.");
+            }
+        }
 
-  // ... rest of the code
-}
-
-function displayLines() {
-  // ... previous code
-
-  // Retrieve messages from Firebase
-  messagesRef.once('value', function(snapshot) {
-    snapshot.forEach(function(childSnapshot) {
-      var message = childSnapshot.val();
-      var lineElement = document.createElement('p');
-      lineElement.textContent = '[' + message.time + '][' + message.user + ']: ' + message.text;
-      document.getElementById('savedTextLines').appendChild(lineElement);
-    });
-  });
-
-  // ... rest of the code
-}
-
+        function displayLines() {
+            // ... previous code
+        }
 
         displayLines();
     </script>

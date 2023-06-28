@@ -1,41 +1,46 @@
 <!DOCTYPE html>
 <html>
-    <head>
-        <meta charset="utf-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1">
-    </head>
-    <body>
+<head>
+  <title>Registration Page</title>
+  <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
+  <script src="firebase-config.js"></script>
+</head>
+<body style="background-color:rgb(114, 11, 11)">
+  <h2>ChairFans Registration Page</h2>
+  <form id="registrationForm">
+    <label for="email">Email:</label>
+    <input type="email" id="email" required><br>
+    <label for="password">Password:</label>
+    <input type="password" id="password" required><br>
+    <button type="submit">Register</button>
+  </form>
 
-        <style>
-            body {background-color:rgb(66, 6, 6); text-align: center; color:white}
-        </style>
+  <script>
+    // Register form submission
+    document.getElementById('registrationForm').addEventListener('submit', function(e) {
+      e.preventDefault();
 
-        <h1 style="color:aquamarine">Account Creation</b></h1>
-        <h4 style="color:white">Create an Account for ChairFans</h4>
-            <p>
+      var email = document.getElementById('email').value;
+      var password = document.getElementById('password').value;
 
-            <br>
-            <br>
-            <br>
-
-            <h2>Register</h2>
-    <form id="registrationForm">
-      <label for="username">Username:</label>
-      <input type="text" id="username" name="username" required>
-      <br>
-      <label for="password">Password:</label>
-      <input type="password" id="password" name="password" required>
-      <br>
-      <button type="submit">Register</button>
-    </form>
-
-    <br>
-    <a href="https://chairfansltd.online/" style="color:rgb(255, 203, 59); text-align: center">Go Back</a>
-
-    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
-    <script src="script.js"></script>
-
-            <div id="output"></div>
-    </body>
+      firebase.auth().createUserWithEmailAndPassword(email, password)
+        .then(function(userCredential) {
+          // Registration successful
+          var user = userCredential.user;
+          console.log('Registration successful:', user);
+          // Redirect to the sign-in page
+          window.location.href = 'sign-in.html';
+        })
+        .catch(function(error) {
+          // Handle registration errors
+          var errorCode = error.code;
+          var errorMessage = error.message;
+          console.error('Registration error:', errorCode, errorMessage);
+          // Display error message to the user
+          alert(errorMessage);
+        });
+    });
+  </script>
+</body>
 </html>
