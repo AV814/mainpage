@@ -45,7 +45,7 @@
     <br>
     <br>
     <p>
-        Version: 2.0.3
+        Version: 2.0.4
     </p>
 
     <input type="text" id="inputBox" placeholder="Enter Message" onkeydown="if(event.key==='Enter'){saveText()}">
@@ -182,7 +182,7 @@
             }
         }
 
-    function saveImage() {
+   function saveImage() {
     var fileInput = document.getElementById('fileInput');
     var file = fileInput.files[0];
     var currentUser = firebase.auth().currentUser;
@@ -192,49 +192,65 @@
             .then(function (idTokenResult) {
                 var displayName = idTokenResult.claims.name || 'Unknown User';
 
-                var storageRef = firebase.storage().ref();
-                var imagesRef = storageRef.child('images/' + file.name);
+                var reader = new FileReader();
+                reader.onload = function (e) {
+                    var img = new Image();
+                    img.onload = function () {
+                        var canvas = document.createElement('canvas');
+                        var maxWidth = 800; // Set your maximum width
+                        var maxHeight = 600; // Set your maximum height
+                        var width = img.width;
+                        var height = img.height;
 
-                imagesRef.put(file)
-                    .then(function (snapshot) {
-                        return snapshot.ref.getDownloadURL();
-                    })
-                    .then(function (downloadURL) {
-                        var newMessageRefBlank = messagesRefBlank.push();
-                        var newMessageRefTime = messagesRefTime.push();
-                        var newMessageRef = messagesRef.push();
+                        if (width > height) {
+                            if (width > maxWidth) {
+                                height *= maxWidth / width;
+                                width = maxWidth;
+                            }
+                        } else {
+                            if (height > maxHeight) {
+                                width *= maxHeight / height;
+                                height = maxHeight;
+                            }
+                        }
 
-                        newMessageRefBlank.set('‎')
-                            .then(function () {
-                                document.getElementById('fileInput').value = '';
-                            })
-                            .catch(function (error) {
-                                console.error('Failed to save image message (blank):', error);
-                                alert("An error occurred while uploading the image.");
-                            });
+                        canvas.width = width;
+                        canvas.height = height;
 
-                        newMessageRefTime.set(new Date().toLocaleString())
-                            .then(function () {
-                                document.getElementById('fileInput').value = '';
-                            })
-                            .catch(function (error) {
-                                console.error('Failed to save image message (time):', error);
-                                alert("An error occurred while uploading the image.");
-                            });
+                        var ctx = canvas.getContext('2d');
+                        ctx.drawImage(img, 0, 0, width, height);
 
-                        newMessageRef.set('[' + displayName + ']: [Image] ' + downloadURL)
-                            .then(function () {
-                                displayLines();
-                            })
-                            .catch(function (error) {
-                                console.error('Failed to save image message (text):', error);
-                                alert("An error occurred while uploading the image.");
-                            });
-                    })
-                    .catch(function (error) {
-                        console.error('Failed to get download URL:', error);
-                        alert("An error occurred while uploading the image.");
-                    });
+                        canvas.toBlob(function (blob) {
+                            var storageRef = firebase.storage().ref();
+                            var imagesRef = storageRef.child('images/' + file.name);
+
+                            imagesRef.put(blob)
+                                .then(function (snapshot) {
+                                    return snapshot.ref.getDownloadURL();
+                                })
+                                .then(function (downloadURL) {
+                                    var messageString = '[' + displayName + ']: [Image] ' + downloadURL;
+
+                                    var newMessageRef = messagesRef.push();
+                                    newMessageRef.set(messageString)
+                                        .then(function () {
+                                            document.getElementById('fileInput').value = '';
+                                            displayLines();
+                                        })
+                                        .catch(function (error) {
+                                            console.error('Failed to save image message:', error);
+                                            alert("An error occurred while uploading the image.");
+                                        });
+                                })
+                                .catch(function (error) {
+                                    console.error('Failed to upload image:', error);
+                                    alert("An error occurred while uploading the image.");
+                                });
+                        });
+                    };
+                    img.src = e.target.result;
+                };
+                reader.readAsDataURL(file);
             })
             .catch(function (error) {
                 console.error('Failed to get ID token result:', error);
@@ -245,6 +261,7 @@
         alert("Please sign in and select a file to upload.");
     }
 }
+
 
 
         function displayLines() {
