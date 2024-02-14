@@ -150,7 +150,8 @@ function saveText() {
           var displayName = idTokenResult.claims.name || 'Unknown User';
 
           // Create the message string
-          var messageString = '[' + displayName + ']: ' + text + '\n' + '(' + currentTime + ')';
+          var messageString = '[' + displayName + ']: ' + text;
+          var messageStringTime = '(' + currentTime + ')';
 
           // Store the message string in Firebase
           var newMessageRef = messagesRef.push(); // Generate a new unique key for the message
@@ -159,6 +160,12 @@ function saveText() {
               // Insert the new message at the top
               var lineElement = document.createElement('p');
               lineElement.textContent = messageString;
+              var savedTextLines = document.getElementById('savedTextLines');
+              //savedTextLines.insertBefore(lineElement, savedTextLines.firstChild);
+
+              // Insert the new date and time at the top
+              var lineElement = document.createElement('p');
+              lineElement.textContent = messageStringTime;
               var savedTextLines = document.getElementById('savedTextLines');
               //savedTextLines.insertBefore(lineElement, savedTextLines.firstChild);
 
