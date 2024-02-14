@@ -4,15 +4,15 @@
 <head>
     <title>Chair Fans Chat Room</title>
 
-<!-- CSS styles -->
-<style>
-    #userAccount {
-        position: absolute;
-        top: 10px;
-        right: 10px;
-        font-size: 14px;
-    }
-</style>
+    <!-- CSS styles -->
+    <style>
+        #userAccount {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            font-size: 14px;
+        }
+    </style>
 
     <style>
         #savedTextLines {
@@ -36,7 +36,6 @@
     <h5 style="text-align: center">(In Development)</h5>
     <p id="loggedInAccount"></p>
     <hr>
-      
 
     <style>
         .vl {
@@ -55,7 +54,7 @@
     <br>
     <br>
     <p>
-        Version: 1.1.6
+        Version: 1.1.7
     </p>
 
     <input type="text" id="inputBox" placeholder="Enter Message">
@@ -71,39 +70,30 @@
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
 
     <script>
+        var loggedInUsername = ''; // Variable to store the logged-in username
 
+        // Update user account information
+        function updateUserAccount() {
+            var currentUser = firebase.auth().currentUser;
 
-
-
-
-var loggedInUsername = ''; // Variable to store the logged-in username
-
-  // Update user account information
-  function updateUserAccount() {
-    var currentUser = firebase.auth().currentUser;
-
-    if (currentUser) {
-      loggedInUsername = currentUser.displayName || 'Unknown User'; // Store the logged-in username
-      document.getElementById('userAccount').textContent = 'Logged in as: ' + loggedInUsername;
-    } else {
-      loggedInUsername = ''; // Reset the variable if the user is not logged in
-      document.getElementById('userAccount').textContent = 'Not logged in';
-    }
-  }
-
-
-
-
+            if (currentUser) {
+                loggedInUsername = currentUser.displayName || 'Unknown User'; // Store the logged-in username
+                document.getElementById('userAccount').textContent = 'Logged in as: ' + loggedInUsername;
+            } else {
+                loggedInUsername = ''; // Reset the variable if the user is not logged in
+                document.getElementById('userAccount').textContent = 'Not logged in';
+            }
+        }
 
         var firebaseConfig = {
             apiKey: "AIzaSyByOJEl2Q5NX5OsuZ2yobTUXlElx0VSooY",
-    authDomain: "textpage1-chair.firebaseapp.com",
-    databaseURL: "https://textpage1-chair-default-rtdb.firebaseio.com",
-    projectId: "textpage1-chair",
-    storageBucket: "textpage1-chair.appspot.com",
-    messagingSenderId: "498007060580",
-    appId: "1:498007060580:web:a4fe4e2dc5d2bfb68f2f71",
-    measurementId: "G-Y23K3YNV76"
+            authDomain: "textpage1-chair.firebaseapp.com",
+            databaseURL: "https://textpage1-chair-default-rtdb.firebaseio.com",
+            projectId: "textpage1-chair",
+            storageBucket: "textpage1-chair.appspot.com",
+            messagingSenderId: "498007060580",
+            appId: "1:498007060580:web:a4fe4e2dc5d2bfb68f2f71",
+            measurementId: "G-Y23K3YNV76"
         };
 
         // Initialize Firebase
@@ -114,223 +104,152 @@ var loggedInUsername = ''; // Variable to store the logged-in username
         var messagesRefTime = database.ref("messages");
         var messagesRefBlank = database.ref("messages");
 
-
         var currentUsername = ''; // Variable to store the current username
 
-// Update user account information
-function updateUserAccount() {
-  var currentUser = firebase.auth().currentUser;
+        // Update user account information
+        function updateUserAccount() {
+            var currentUser = firebase.auth().currentUser;
 
-  if (currentUser) {
-    currentUsername = currentUser.displayName || ''; // Store the display name in the variable
-    document.getElementById('userAccount').textContent = 'Logged in as: ' + currentUsername;
-  } else {
-    currentUsername = ''; // Reset the variable if the user is not logged in
-    document.getElementById('userAccount').textContent = 'Not logged in';
-  }
-}
+            if (currentUser) {
+                currentUsername = currentUser.displayName || ''; // Store the display name in the variable
+                document.getElementById('userAccount').textContent = 'Logged in as: ' + currentUsername;
+            } else {
+                currentUsername = ''; // Reset the variable if the user is not logged in
+                document.getElementById('userAccount').textContent = 'Not logged in';
+            }
+        }
 
+        function saveText() {
+            var text = document.getElementById('inputBox').value;
 
+            var currentTime = new Date().toLocaleString(undefined, {
+                year: 'numeric',
+                month: 'short',
+                weekday: 'narrow',
+                day: 'numeric',
+                hour: 'numeric',
+                minute: 'numeric',
+                second: 'numeric',
+                hour12: true,
+            });
 
-function saveText() {
-    var text = document.getElementById('inputBox').value;
+            var currentUser = firebase.auth().currentUser;
 
-    var currentTime = new Date().toLocaleString(undefined, {
-    year: 'numeric',
-    month: 'short', // 'long', 'short' or 'narrow'
-    weekday: 'narrow', // 'long' or 'short' or 'narrow'
-    day: 'numeric',
-    hour: 'numeric',
-    minute: 'numeric',
-    second: 'numeric',
-    hour12: true, // Set to false if you want 24-hour format
-});
+            if (currentUser) {
+                currentUser.getIdTokenResult()
+                    .then(function (idTokenResult) {
+                        var displayName = idTokenResult.claims.name || 'Unknown User';
 
+                        var storageRef = firebase.storage().ref();
 
-function saveImage() { // START OF SAVEIMAGE
-    var fileInput = document.getElementById('fileInput');
-    var file = fileInput.files[0];
-    var currentUser = firebase.auth().currentUser;
+                        var newMessageRefBlank = messagesRefBlank.push();
+                        newMessageRefBlank.set('‎');
 
-    if (currentUser && file) {
-        currentUser.getIdTokenResult()
-            .then(function (idTokenResult) {
-                var displayName = idTokenResult.claims.name || 'Unknown User';
-
-                var storageRef = firebase.storage().ref();
-                var imagesRef = storageRef.child('images/' + file.name);
-
-                imagesRef.put(file)
-                    .then(function (snapshot) {
-                        return snapshot.ref.getDownloadURL();
-                    })
-                    .then(function (downloadURL) {
-                        var messageString = '[' + displayName + ']: [Image] ' + downloadURL;
+                        var newMessageRefTime = messagesRefTime.push();
+                        newMessageRefTime.set('(' + currentTime + ')');
 
                         var newMessageRef = messagesRef.push();
-                        newMessageRef.set(messageString)
+
+                        newMessageRef.set('[' + displayName + ']: ' + text)
                             .then(function () {
-                                document.getElementById('fileInput').value = '';
+                                document.getElementById('inputBox').value = '';
                                 displayLines();
                             })
                             .catch(function (error) {
-                                console.error('Failed to save image message:', error);
+                                console.error('Failed to save message:', error);
+                                alert("An error occurred while sending the message.");
+                            });
+
+                    })
+                    .catch(function (error) {
+                        console.error('Failed to get ID token result:', error);
+                        alert("An error occurred while sending the message.");
+                    });
+            } else {
+                console.log('User is not signed in. Message submission not allowed.');
+                alert("Please sign in to send a message.");
+            }
+        }
+
+        function saveImage() {
+            var fileInput = document.getElementById('fileInput');
+            var file = fileInput.files[0];
+            var currentUser = firebase.auth().currentUser;
+
+            if (currentUser && file) {
+                currentUser.getIdTokenResult()
+                    .then(function (idTokenResult) {
+                        var displayName = idTokenResult.claims.name || 'Unknown User';
+
+                        var storageRef = firebase.storage().ref();
+                        var imagesRef = storageRef.child('images/' + file.name);
+
+                        imagesRef.put(file)
+                            .then(function (snapshot) {
+                                return snapshot.ref.getDownloadURL();
+                            })
+                            .then(function (downloadURL) {
+                                var newMessageRefBlank = messagesRefBlank.push();
+                                newMessageRefBlank.set('‎');
+
+                                var newMessageRefTime = messagesRefTime.push();
+                                newMessageRefTime.set('(' + new Date().toLocaleString() + ')');
+
+                                var newMessageRef = messagesRef.push();
+
+                                newMessageRef.set('[' + displayName + ']: [Image] ' + downloadURL)
+                                    .then(function () {
+                                        document.getElementById('fileInput').value = '';
+                                        displayLines();
+                                    })
+                                    .catch(function (error) {
+                                        console.error('Failed to save image message:', error);
+                                        alert("An error occurred while uploading the image.");
+                                    });
+                            })
+                            .catch(function (error) {
+                                console.error('Failed to upload image:', error);
                                 alert("An error occurred while uploading the image.");
                             });
                     })
                     .catch(function (error) {
-                        console.error('Failed to upload image:', error);
+                        console.error('Failed to get ID token result:', error);
                         alert("An error occurred while uploading the image.");
                     });
-            })
-            .catch(function (error) {
-                console.error('Failed to get ID token result:', error);
-                alert("An error occurred while uploading the image.");
+            } else {
+                console.log('User is not signed in or no file selected.');
+                alert("Please sign in and select a file to upload.");
+            }
+        }
+
+        function displayLines() {
+            // Clear the existing messages
+            var savedTextLines = document.getElementById('savedTextLines');
+            savedTextLines.innerHTML = '';
+
+            // Retrieve messages from Firebase
+            messagesRef.on('child_added', function (snapshot) {
+                var message = snapshot.val();
+
+                var lineElement = document.createElement('p');
+                lineElement.textContent = message;
+
+                savedTextLines.insertBefore(lineElement, savedTextLines.firstChild);
             });
-    } else {
-        console.log('User is not signed in or no file selected.');
-        alert("Please sign in and select a file to upload.");
-    }
-} //END OF SAVEIMAGE
+        }
 
+        // Listen for authentication state changes
+        firebase.auth().onAuthStateChanged(function (user) {
+            updateUserAccount();
 
-    
-    var currentUser = firebase.auth().currentUser;
-
-    if (currentUser) {
-      currentUser.getIdTokenResult()
-        .then(function(idTokenResult) {
-          // User is signed in
-          var displayName = idTokenResult.claims.name || 'Unknown User';
-
-          // Create the message string
-          var messageString = '[' + displayName + ']: ' + text;
-          var messageTime = '(' + currentTime + ')';
-          var messageBlank = '‎ ';
-            //has invisible character ^
-
-          // Store the message string in Firebase
-            var newMessageRefBlank = messagesRefBlank.push(); // Generate a new unique key for the message TIME
-            var newMessageRefTime = messagesRefTime.push(); // Generate a new unique key for the message TIME
-            var newMessageRef = messagesRef.push(); // Generate a new unique key for the message TEXT
-
-          newMessageRefBlank.set(messageBlank)
-            .then(function() {
-              // Insert the new message at the top
-              var lineElementBlank = document.createElement('p');
-              lineElementBlank.textContent = messageBlank;
-              var savedTextLinesBlank = document.getElementById('savedTextLinesBlank');
-              //savedTextLines.insertBefore(lineElement, savedTextLines.firstChild);
-
-              // Clear the input box after submission
-              document.getElementById('inputBox').value = '';
-            })
-            .catch(function(error) {
-              console.error('Failed to save message:', error);
-              alert("An error occurred while sending the message.");
-            });
-
-            newMessageRefTime.set(messageTime)
-            .then(function() {
-              // Insert the new message at the top
-              var lineElementTime = document.createElement('p');
-              lineElementTime.textContent = messageTime;
-              var savedTextLinesTime = document.getElementById('savedTextLinesTime');
-              //savedTextLines.insertBefore(lineElement, savedTextLines.firstChild);
-
-              // Clear the input box after submission
-              document.getElementById('inputBox').value = '';
-            })
-            .catch(function(error) {
-              console.error('Failed to save message:', error);
-              alert("An error occurred while sending the message.");
-            });
-
-            newMessageRef.set(messageString)
-            .then(function() {
-              // Insert the new message at the top
-              var lineElement = document.createElement('p');
-              lineElement.textContent = messageString;
-              var savedTextLines = document.getElementById('savedTextLines');
-              //savedTextLines.insertBefore(lineElement, savedTextLines.firstChild);
-
-              // Clear the input box after submission
-              document.getElementById('inputBox').value = '';
-            })
-            .catch(function(error) {
-              console.error('Failed to save message:', error);
-              alert("An error occurred while sending the message.");
-            });
-
-
-        })
-        .catch(function(error) {
-          console.error('Failed to get ID token result:', error);
-          alert("An error occurred while sending the message.");
+            if (user) {
+                displayLines(); // Fetch and display the chat history
+            }
         });
-    } else {
-      // User is not signed in, handle appropriately (e.g., display an error message)
-      console.log('User is not signed in. Message submission not allowed.');
-      alert("Please sign in to send a message.");
-    }
-  }
-
-function displayLines() {
-  // Clear the existing messages
-  var savedTextLines = document.getElementById('savedTextLines');
-  savedTextLines.innerHTML = '';
-
-  // Retrieve messages from Firebase
-  messagesRef.on('child_added', function(snapshot) {
-    var message = snapshot.val();
-
-    var lineElement = document.createElement('p');
-    lineElement.textContent = message;
-
-    savedTextLines.insertBefore(lineElement, savedTextLines.firstChild);
-  });
-}
-
-// Listen for authentication state changes
-firebase.auth().onAuthStateChanged(function(user) {
-    updateUserAccount();
-
-    if (user) {
-      displayLines(); // Fetch and display the chat history
-    }
-  });
-
-
-        //displayLines();
     </script>
 
-
-<!-- User Account -->
-<div id="userAccount"></div>
-
-<!-- ... existing code ... -->
-
-<script>
-    // ... existing JavaScript code ...
-
-    // Update user account information
-    function updateUserAccount() {
-        var currentUser = firebase.auth().currentUser;
-
-        if (currentUser) {
-            var displayName = currentUser.displayName;
-            document.getElementById('userAccount').textContent = 'Logged in as: ' + displayName;
-        } else {
-            document.getElementById('userAccount').textContent = 'Not logged in';
-        }
-    }
-
-    // Listen for authentication state changes
-    firebase.auth().onAuthStateChanged(function(user) {
-        updateUserAccount();
-    });
-</script>
-
+    <!-- User Account -->
+    <div id="userAccount"></div>
 </body>
 
 </html>
