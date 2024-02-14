@@ -45,15 +45,14 @@
     <br>
     <br>
     <p>
-        Version: 1.2.2
+        Version: 2.0.0
     </p>
 
     <input type="text" id="inputBox" placeholder="Enter Message">
     <button onClick="saveText()"> Submit Text </button>
-    <div id="savedTextLines"></div>
-
     <input type="file" id="fileInput" accept="image/*">
     <button onClick="saveImage()"> Upload Image </button>
+    <div id="savedTextLines"></div>
 
     <!-- Add the Firebase SDK -->
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
@@ -145,7 +144,7 @@
                                 alert("An error occurred while sending the message.");
                             });
 
-                        newMessageRefTime.set(currentTime)
+                        newMessageRefTime.set('(' + currentTime + ')')
                             .then(function () {
                                 document.getElementById('inputBox').value = '';
                             })
@@ -175,7 +174,7 @@
             }
         }
 
-        function saveImage() {
+    function saveImage() {
     var fileInput = document.getElementById('fileInput');
     var file = fileInput.files[0];
     var currentUser = firebase.auth().currentUser;
