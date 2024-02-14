@@ -57,7 +57,7 @@
     <br>
     <br>
     <p>
-        Version: 0.2.6
+        Version: 0.2.7
     </p>
 
     <input type="text" id="inputBox" placeholder="Enter Message">
@@ -157,18 +157,12 @@ function saveText() {
 
           // Store the message string in Firebase
           var newMessageRef = messagesRef.push(); // Generate a new unique key for the message
-          newMessageRef.set(messageString)
-            .then(function() {
-            // Insert the new message at the top
-            var lineElement = document.createElement('p');
-            lineElement.textContent = messageString;
-            //var savedTextLines = document.getElementById('savedTextLines');
-                
-              //savedTextLines.insertBefore(lineElement, savedTextLines.firstChild);
+                newMessageRef.set(messageObject)
+                    .then(function () {
+                        // Clear the input box after submission
+                        document.getElementById('inputBox').value = '';
+                    })
 
-              // Clear the input box after submission
-              document.getElementById('inputBox').value = '';
-            })
             .catch(function(error) {
               console.error('Failed to save message:', error);
               alert("An error occurred while sending the message.");
@@ -185,24 +179,24 @@ function saveText() {
     }
   }
 
-  function displayLines() {
-  // Clear the existing messages
-  var savedTextLines = document.getElementById('savedTextLines');
-  savedTextLines.innerHTML = '';
+function displayLines() {
+    // Clear the existing messages
+    var savedTextLines = document.getElementById('savedTextLines');
+    savedTextLines.innerHTML = '';
 
-  // Retrieve messages from Firebase
-  messagesRef.on('child_added', function (snapshot) {
+    // Retrieve messages from Firebase
+    messagesRef.on('child_added', function (snapshot) {
         var message = snapshot.val();
 
         var userMessageElement = document.createElement('p');
-        userMessageElement.textContent = '[' + displayName + ']: ' + message.text;
+        userMessageElement.textContent = '[' + currentDisplayName + ']: ' + message.text;
 
         var timeElement = document.createElement('p');
         timeElement.textContent = '(' + message.time + ')';
 
         savedTextLines.appendChild(userMessageElement);
         savedTextLines.appendChild(timeElement);
-  });
+    });
 }
 
 // Listen for authentication state changes
