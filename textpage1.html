@@ -57,7 +57,7 @@
     <br>
     <br>
     <p>
-        Version: 1.0.0
+        Version: 1.0.1
     </p>
 
     <input type="text" id="inputBox" placeholder="put some text here i guess">
@@ -169,9 +169,9 @@ function saveText() {
             newMessageRefTime.set(messageTime)
             .then(function() {
               // Insert the new message at the top
-              var lineElement = document.createElement('p');
-              lineElement.textContent = messageTime;
-              var savedTextLines = document.getElementById('savedTextLines');
+              var lineElementTime = document.createElement('p');
+              lineElementTime.textContent = messageTime;
+              var savedTextLinesTime = document.getElementById('savedTextLinesTime');
               //savedTextLines.insertBefore(lineElement, savedTextLines.firstChild);
 
               // Clear the input box after submission
@@ -200,6 +200,9 @@ function saveText() {
   var savedTextLines = document.getElementById('savedTextLines');
   savedTextLines.innerHTML = '';
 
+  var savedTextLinesTime = document.getElementById('savedTextLinesTime');
+  savedTextLinesTime.innerHTML = '';
+
   // Retrieve messages from Firebase
   messagesRef.on('child_added', function(snapshot) {
     var message = snapshot.val();
@@ -208,6 +211,16 @@ function saveText() {
     lineElement.textContent = message;
 
     savedTextLines.insertBefore(lineElement, savedTextLines.firstChild);
+  });
+
+  // Retrieve time messages from Firebase
+  messagesRefTime.on('child_added', function(snapshotTime) {
+    var messageTime = snapshotTime.val();
+
+    var lineElementTime = document.createElement('p');
+    lineElementTime.textContent = message;
+
+    savedTextLinesTime.insertBefore(lineElementTime, savedTextLinesTime.firstChild);
   });
 }
 
