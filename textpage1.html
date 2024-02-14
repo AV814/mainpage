@@ -57,7 +57,7 @@
     <br>
     <br>
     <p>
-        Version: 0.1.8
+        Version: 0.1.9
     </p>
 
     <input type="text" id="inputBox" placeholder="Enter Message">
@@ -150,7 +150,7 @@ function saveText() {
           var displayName = idTokenResult.claims.name || 'Unknown User';
 
           // Create the message string
-          var messageString = '[' + displayName + ']: ' + text + '\n(' + currentTime + ')';
+          var messageString = '[' + displayName + ']: ' + text + '<br>(' + currentTime + ')';
 
           // Store the message string in Firebase
           var newMessageRef = messagesRef.push(); // Generate a new unique key for the message
