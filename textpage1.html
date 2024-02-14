@@ -57,7 +57,7 @@
     <br>
     <br>
     <p>
-        Version: 0.2.7
+        Version: 0.2.8
     </p>
 
     <input type="text" id="inputBox" placeholder="Enter Message">
@@ -137,47 +137,49 @@ function updateUserAccount() {
   }
 }
 
-
-
 function saveText() {
     var text = document.getElementById('inputBox').value;
     var currentUser = firebase.auth().currentUser;
 
     if (currentUser) {
-      currentUser.getIdTokenResult()
-        .then(function(idTokenResult) {
-          // User is signed in
-          var displayName = idTokenResult.claims.name || 'Unknown User';
+        currentUser.getIdToken(/* forceRefresh */ true)
+            .then(function (idToken) {
+                // User is signed in
+                var decodedToken = firebase.auth().currentUser.getIdTokenResult();
 
-          // Create the message string
-          var messageString = {
-            text: text,
-            time: currentTime
-          };
+                decodedToken.then((result) => {
+                    var displayName = result.claims.name || 'Unknown User';
 
-          // Store the message string in Firebase
-          var newMessageRef = messagesRef.push(); // Generate a new unique key for the message
-                newMessageRef.set(messageObject)
-                    .then(function () {
-                        // Clear the input box after submission
-                        document.getElementById('inputBox').value = '';
-                    })
+                    // Create the message object
+                    var messageObject = {
+                        text: text,
+                        time: currentTime
+                    };
 
-            .catch(function(error) {
-              console.error('Failed to save message:', error);
-              alert("An error occurred while sending the message.");
+                    // Store the message object in Firebase
+                    var newMessageRef = messagesRef.push(); // Generate a new unique key for the message
+                    newMessageRef.set(messageObject)
+                        .then(function () {
+                            // Clear the input box after submission
+                            document.getElementById('inputBox').value = '';
+                        })
+                        .catch(function (error) {
+                            console.error('Failed to save message:', error);
+                            alert("An error occurred while sending the message.");
+                        });
+                });
+            })
+            .catch(function (error) {
+                console.error('Failed to get ID token:', error);
+                alert("An error occurred while sending the message.");
             });
-        })
-        .catch(function(error) {
-          console.error('Failed to get ID token result:', error);
-          alert("An error occurred while sending the message.");
-        });
     } else {
-      // User is not signed in, handle appropriately (e.g., display an error message)
-      console.log('User is not signed in. Message submission not allowed.');
-      alert("Please sign in to send a message.");
+        // User is not signed in, handle appropriately (e.g., display an error message)
+        console.log('User is not signed in. Message submission not allowed.');
+        alert("Please sign in to send a message.");
     }
-  }
+}
+
 
 function displayLines() {
     // Clear the existing messages
