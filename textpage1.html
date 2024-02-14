@@ -57,7 +57,7 @@
     <br>
     <br>
     <p>
-        Version: 0.2.1
+        Version: 0.2.2
     </p>
 
     <input type="text" id="inputBox" placeholder="Enter Message">
@@ -151,7 +151,7 @@ function saveText() {
 
           // Create the message string
           var messageString = '[' + displayName + ']: ' + text ;
-          var messageTime = '[' + currentTime + ']';
+          var messageTime = '(' + currentTime + ')';
 
           // Store the message string in Firebase
           var newMessageRef = messagesRef.push(); // Generate a new unique key for the message
@@ -160,10 +160,7 @@ function saveText() {
             // Insert the new message at the top
             var lineElement = document.createElement('p');
             lineElement.textContent = messageString;
-            var savedTextLines = document.getElementById('savedTextLines');
-
-            lineElement.textContent = messageTime;
-            var savedTextLines = document.getElementById('savedTextLines');
+            //var savedTextLines = document.getElementById('savedTextLines');
                 
               //savedTextLines.insertBefore(lineElement, savedTextLines.firstChild);
 
@@ -197,6 +194,11 @@ function saveText() {
 
     var lineElement = document.createElement('p');
     lineElement.textContent = message;
+
+    savedTextLines.insertBefore(lineElement, savedTextLines.firstChild);
+
+    var lineElement = document.createElement('p');
+    lineElement.textContent = messageTime;
 
     savedTextLines.insertBefore(lineElement, savedTextLines.firstChild);
   });
