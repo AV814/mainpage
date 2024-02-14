@@ -45,7 +45,7 @@
     <br>
     <br>
     <p>
-        Version: 2.0.3
+        Version: 2.0.2
     </p>
 
     <input type="text" id="inputBox" placeholder="Enter Message" onkeydown="if(event.key==='Enter'){saveText()}">
@@ -254,21 +254,24 @@
 
 
         function displayLines() {
-    // Clear the existing messages
-    var savedTextLines = document.getElementById('savedTextLines');
-    savedTextLines.innerHTML = '';
+            var savedTextLines = document.getElementById('savedTextLines');
+            savedTextLines.innerHTML = '';
 
-    // Retrieve messages from Firebase
-    messagesRef.on('child_added', function (snapshot) {
-        var message = snapshot.val();
+            messagesRef.on('child_added', function (snapshot) {
+                var message = snapshot.val();
+                var lineElement = document.createElement('p');
 
-        var lineElement = document.createElement('p');
-        lineElement.textContent = message;
+                if (message.includes('[Image]')) {
+                    var imgElement = document.createElement('img');
+                    imgElement.src = extractImageUrl(message);
+                    lineElement.appendChild(imgElement);
+                } else {
+                    lineElement.textContent = message;
+                }
 
-        savedTextLines.appendChild(lineElement); // Use appendChild instead of insertBefore
-    });
-}
-
+                savedTextLines.insertBefore(lineElement, savedTextLines.firstChild);
+            });
+        }
 
         function extractImageUrl(message) {
             var matches = message.match(/\[Image\]\s*(https:\/\/[^\s]+)/);
