@@ -1,10 +1,15 @@
 <!DOCTYPE html>
 <html>
 
-<head>
-    <title>Chair Fans Chat Room</title>
+    <style>
+        body {background-color:rgb(25, 73, 78); text-align: center; color:white; background-image: "kansas.gif";}
+    </style>
 
-<!-- CSS styles -->
+    <head>
+
+        <title>ChairFans</title>
+
+        <!-- CSS styles -->
 <style>
     /* ... existing styles ... */
 
@@ -16,84 +21,51 @@
     }
 </style>
 
-    <style>
-        #savedTextLines {
-            line-height: 0.5;
-        }
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+    </head>
+    <body style="background-color:rgb(25, 73, 78)">
+        
+        <h1 style="color:white">THIS IS <b style="color:aquamarine">THE WEBSITE OF ALL TIME</b></h1>
+        <h4 style="color:white">Proof of Ownership by the "Gameing©" discord server.</h4>
+            <p>
+                Currently adding random stuff.
+            </p>
+            <br>
+            <img src="kansas.gif" width="380" height="auto">
+            <br>
+            <br>
+            <h3>The Index</h3>
+            <a href="https://chairfansltd.online/textpage1" style="color:rgb(255, 203, 59)">Chair Fans CHAT ROOM</a>
+            <br>
+            <a href="https://chairfansltd.online/thebutton" style="color:rgb(255, 203, 59)">[OUT OF DATE] THE BUTTON</a>
 
-        #savedTextLines p {
-            margin-bottom: 5px;
-        }
+            <br>
+            <br>
+            <br>
 
-        body {
-            background-color: rgb(48, 8, 112);
-            text-align: left;
-            color: white;
-        }
-    </style>
-</head>
+            <div id="output"></div>
 
-<body>
-    <h2 style="text-align: center">THE TEXT PAGE</h2>
-    <h5 style="text-align: center">(In Development)</h5>
-    <p id="loggedInAccount"></p>
-    <hr>
-      
+            <br>
+            <br>
+            <br>
+            <h5>Disclaimer: This website is <b style="color:aquamarine">under construction</b></h1>
+                <h5><b style="color:aquamarine">Last updated 2/14/2024</b></h1>
 
-    <style>
-        .vl {
-            border-left: 6px solid green;
-            height: 500px;
-        }
-    </style>
+                <h5><b style="color:aquamarine">Copyright® 2024</b></h1>
 
-    <t>Don't have a ChairFans Account? </t>
-    <a href="https://chairfansltd.online/create-account" style="color:rgb(255, 203, 59); text-align: center">Create One!</a>
-    <br>
-    <t>Already have a ChairFans Account? If not signed in already, </t>
-    <a href="https://chairfansltd.online/sign-in" style="color:rgb(255, 203, 59); text-align: center">Sign In!</a>
-    <br>
-    <a href="https://chairfansltd.online/" style="color:rgb(255, 203, 59); text-align: center">Go back to Main Page</a>
-    <br>
-    <br>
-    <p>
-        Version: 0.1.3
-    </p>
+            </script>
 
-    <input type="text" id="inputBox" placeholder="Enter Message">
-    <button onClick="saveText()"> Submit Text </button>
-    <div id="savedTextLines"></div>
 
-    <!-- Add the Firebase SDK -->
+            <!-- User Account -->
+            <div id="userAccount"></div>
+            
+            <!-- ... existing code ... -->    <!-- Add the Firebase SDK -->
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
 
     <script>
-
-
-
-
-
-var loggedInUsername = ''; // Variable to store the logged-in username
-
-  // Update user account information
-  function updateUserAccount() {
-    var currentUser = firebase.auth().currentUser;
-
-    if (currentUser) {
-      loggedInUsername = currentUser.displayName || 'Unknown User'; // Store the logged-in username
-      document.getElementById('userAccount').textContent = 'Logged in as: ' + loggedInUsername;
-    } else {
-      loggedInUsername = ''; // Reset the variable if the user is not logged in
-      document.getElementById('userAccount').textContent = 'Not logged in';
-    }
-  }
-
-
-
-
-
         var firebaseConfig = {
             apiKey: "AIzaSyByOJEl2Q5NX5OsuZ2yobTUXlElx0VSooY",
     authDomain: "textpage1-chair.firebaseapp.com",
@@ -108,126 +80,31 @@ var loggedInUsername = ''; // Variable to store the logged-in username
         // Initialize Firebase
         firebase.initializeApp(firebaseConfig);
 
-        var database = firebase.database();
-        var messagesRef = database.ref("messages");
+        </script>
+            
+            
+            <script>
+                // ... existing JavaScript code ...
+            
+                // Update user account information
+                function updateUserAccount() {
+                    var currentUser = firebase.auth().currentUser;
+            
+                    if (currentUser) {
+                        var displayName = currentUser.displayName;
+                        document.getElementById('userAccount').textContent = 'Logged in as: ' + displayName;
+                    } else {
+                        document.getElementById('userAccount').textContent = 'Not logged in';
+                    }
+                }
+            
+                // Listen for authentication state changes
+                firebase.auth().onAuthStateChanged(function(user) {
+                    updateUserAccount();
+                });
+            </script>
 
+            
 
-        var currentUsername = ''; // Variable to store the current username
-
-// Update user account information
-function updateUserAccount() {
-  var currentUser = firebase.auth().currentUser;
-
-  if (currentUser) {
-    currentUsername = currentUser.displayName || ''; // Store the display name in the variable
-    document.getElementById('userAccount').textContent = 'Logged in as: ' + currentUsername;
-  } else {
-    currentUsername = ''; // Reset the variable if the user is not logged in
-    document.getElementById('userAccount').textContent = 'Not logged in';
-  }
-}
-
-
-
-function saveText() {
-    var text = document.getElementById('inputBox').value;
-    var currentTime = new Date().toLocaleTimeString();
-    var currentUser = firebase.auth().currentUser;
-
-    if (currentUser) {
-      currentUser.getIdTokenResult()
-        .then(function(idTokenResult) {
-          // User is signed in
-          var displayName = idTokenResult.claims.name || 'Unknown User';
-
-          // Create the message string
-          var messageString = '[' + currentTime + ' - ' + displayName + ']: ' + text;
-
-          // Store the message string in Firebase
-          var newMessageRef = messagesRef.push(); // Generate a new unique key for the message
-          newMessageRef.set(messageString)
-            .then(function() {
-              // Insert the new message at the top
-              var lineElement = document.createElement('p');
-              lineElement.textContent = messageString;
-              var savedTextLines = document.getElementById('savedTextLines');
-              //savedTextLines.insertBefore(lineElement, savedTextLines.firstChild);
-
-              // Clear the input box after submission
-              document.getElementById('inputBox').value = '';
-            })
-            .catch(function(error) {
-              console.error('Failed to save message:', error);
-              alert("An error occurred while sending the message.");
-            });
-        })
-        .catch(function(error) {
-          console.error('Failed to get ID token result:', error);
-          alert("An error occurred while sending the message.");
-        });
-    } else {
-      // User is not signed in, handle appropriately (e.g., display an error message)
-      console.log('User is not signed in. Message submission not allowed.');
-      alert("Please sign in to send a message.");
-    }
-  }
-
-  function displayLines() {
-  // Clear the existing messages
-  var savedTextLines = document.getElementById('savedTextLines');
-  savedTextLines.innerHTML = '';
-
-  // Retrieve messages from Firebase
-  messagesRef.on('child_added', function(snapshot) {
-    var message = snapshot.val();
-
-    var lineElement = document.createElement('p');
-    lineElement.textContent = message;
-
-    savedTextLines.insertBefore(lineElement, savedTextLines.firstChild);
-  });
-}
-
-// Listen for authentication state changes
-firebase.auth().onAuthStateChanged(function(user) {
-    updateUserAccount();
-
-    if (user) {
-      displayLines(); // Fetch and display the chat history
-    }
-  });
-
-
-        //displayLines();
-    </script>
-
-
-<!-- User Account -->
-<div id="userAccount"></div>
-
-<!-- ... existing code ... -->
-
-<script>
-    // ... existing JavaScript code ...
-
-    // Update user account information
-    function updateUserAccount() {
-        var currentUser = firebase.auth().currentUser;
-
-        if (currentUser) {
-            var displayName = currentUser.displayName;
-            document.getElementById('userAccount').textContent = 'Logged in as: ' + displayName;
-        } else {
-            document.getElementById('userAccount').textContent = 'Not logged in';
-        }
-    }
-
-    // Listen for authentication state changes
-    firebase.auth().onAuthStateChanged(function(user) {
-        updateUserAccount();
-    });
-</script>
-
-</body>
-
+    </body>
 </html>
