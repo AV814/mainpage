@@ -45,7 +45,7 @@
     <br>
     <br>
     <p>
-        Version: 1.2.0
+        Version: 1.2.1
     </p>
 
     <input type="text" id="inputBox" placeholder="Enter Message">
@@ -175,68 +175,69 @@
         }
 
         function saveImage() {
-            var fileInput = document.getElementById('fileInput');
-            var file = fileInput.files[0];
-            var currentUser = firebase.auth().currentUser;
+    var fileInput = document.getElementById('fileInput');
+    var file = fileInput.files[0];
+    var currentUser = firebase.auth().currentUser;
 
-            if (currentUser && file) {
-                currentUser.getIdTokenResult()
-                    .then(function (idTokenResult) {
-                        var displayName = idTokenResult.claims.name || 'Unknown User';
+    if (currentUser && file) {
+        currentUser.getIdTokenResult()
+            .then(function (idTokenResult) {
+                var displayName = idTokenResult.claims.name || 'Unknown User';
 
-                        var storageRef = firebase.storage().ref();
-                        var imagesRef = storageRef.child('images/' + file.name);
+                var storageRef = firebase.storage().ref();
+                var imagesRef = storageRef.child('images/' + file.name);
 
-                        imagesRef.put(file)
-                            .then(function (snapshot) {
-                                return snapshot.ref.getDownloadURL();
-                            })
-                            .then(function (downloadURL) {
-                                var newMessageRefBlank = messagesRefBlank.push();
-                                var newMessageRefTime = messagesRefTime.push();
-                                var newMessageRef = messagesRef.push();
+                imagesRef.put(file)
+                    .then(function (snapshot) {
+                        return snapshot.ref.getDownloadURL();
+                    })
+                    .then(function (downloadURL) {
+                        var newMessageRefBlank = messagesRefBlank.push();
+                        var newMessageRefTime = messagesRefTime.push();
+                        var newMessageRef = messagesRef.push();
 
-                                newMessageRefBlank.set('‎')
-                                    .then(function () {
-                                        document.getElementById('fileInput').value = '';
-                                    })
-                                    .catch(function (error) {
-                                        console.error('Failed to save image message:', error);
-                                        alert("An error occurred while uploading the image.");
-                                    });
-
-                                newMessageRefTime.set(new Date().toLocaleString())
-                                    .then(function () {
-                                        document.getElementById('fileInput').value = '';
-                                    })
-                                    .catch(function (error) {
-                                        console.error('Failed to save image message:', error);
-                                        alert("An error occurred while uploading the image.");
-                                    });
-
-                                newMessageRef.set('[' + displayName + ']: [Image] ' + downloadURL)
-                                    .then(function () {
-                                        displayLines();
-                                    })
-                                    .catch(function (error) {
-                                        console.error('Failed to save image message:', error);
-                                        alert("An error occurred while uploading the image.");
-                                    });
+                        newMessageRefBlank.set('‎')
+                            .then(function () {
+                                document.getElementById('fileInput').value = '';
                             })
                             .catch(function (error) {
-                                console.error('Failed to upload image:', error);
+                                console.error('Failed to save image message (blank):', error);
+                                alert("An error occurred while uploading the image.");
+                            });
+
+                        newMessageRefTime.set(new Date().toLocaleString())
+                            .then(function () {
+                                document.getElementById('fileInput').value = '';
+                            })
+                            .catch(function (error) {
+                                console.error('Failed to save image message (time):', error);
+                                alert("An error occurred while uploading the image.");
+                            });
+
+                        newMessageRef.set('[' + displayName + ']: [Image] ' + downloadURL)
+                            .then(function () {
+                                displayLines();
+                            })
+                            .catch(function (error) {
+                                console.error('Failed to save image message (text):', error);
                                 alert("An error occurred while uploading the image.");
                             });
                     })
                     .catch(function (error) {
-                        console.error('Failed to get ID token result:', error);
+                        console.error('Failed to get download URL:', error);
                         alert("An error occurred while uploading the image.");
                     });
-            } else {
-                console.log('User is not signed in or no file selected.');
-                alert("Please sign in and select a file to upload.");
-            }
-        }
+            })
+            .catch(function (error) {
+                console.error('Failed to get ID token result:', error);
+                alert("An error occurred while uploading the image.");
+            });
+    } else {
+        console.log('User is not signed in or no file selected.');
+        alert("Please sign in and select a file to upload.");
+    }
+}
+
 
         function displayLines() {
             var savedTextLines = document.getElementById('savedTextLines');
