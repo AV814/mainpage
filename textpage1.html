@@ -57,7 +57,7 @@
     <br>
     <br>
     <p>
-        Version: 1.0.6
+        Version: 1.0.7
     </p>
 
     <input type="text" id="inputBox" placeholder="Enter Message">
@@ -111,6 +111,7 @@ var loggedInUsername = ''; // Variable to store the logged-in username
         var database = firebase.database();
         var messagesRef = database.ref("messages");
         var messagesRefTime = database.ref("messages");
+        var messagesRefBlank = database.ref("messages");
 
 
         var currentUsername = ''; // Variable to store the current username
