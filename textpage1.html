@@ -57,7 +57,7 @@
     <br>
     <br>
     <p>
-        Version: 1.1.4
+        Version: 1.1.5
     </p>
 
     <input type="text" id="inputBox" placeholder="Enter Message">
@@ -135,15 +135,63 @@ function saveText() {
     var text = document.getElementById('inputBox').value;
 
     var currentTime = new Date().toLocaleString(undefined, {
-    weekday: 'narrow', // 'long' or 'short' or 'narrow'
     year: 'numeric',
     month: 'short', // 'long', 'short' or 'narrow'
+    weekday: 'narrow', // 'long' or 'short' or 'narrow'
     day: 'numeric',
     hour: 'numeric',
     minute: 'numeric',
     second: 'numeric',
     hour12: true, // Set to false if you want 24-hour format
 });
+
+
+function saveImage() { // START OF SAVEIMAGE
+    var fileInput = document.getElementById('fileInput');
+    var file = fileInput.files[0];
+    var currentUser = firebase.auth().currentUser;
+
+    if (currentUser && file) {
+        currentUser.getIdTokenResult()
+            .then(function (idTokenResult) {
+                var displayName = idTokenResult.claims.name || 'Unknown User';
+
+                var storageRef = firebase.storage().ref();
+                var imagesRef = storageRef.child('images/' + file.name);
+
+                imagesRef.put(file)
+                    .then(function (snapshot) {
+                        return snapshot.ref.getDownloadURL();
+                    })
+                    .then(function (downloadURL) {
+                        var messageString = '[' + displayName + ']: [Image] ' + downloadURL;
+
+                        var newMessageRef = messagesRef.push();
+                        newMessageRef.set(messageString)
+                            .then(function () {
+                                document.getElementById('fileInput').value = '';
+                                displayLines();
+                            })
+                            .catch(function (error) {
+                                console.error('Failed to save image message:', error);
+                                alert("An error occurred while uploading the image.");
+                            });
+                    })
+                    .catch(function (error) {
+                        console.error('Failed to upload image:', error);
+                        alert("An error occurred while uploading the image.");
+                    });
+            })
+            .catch(function (error) {
+                console.error('Failed to get ID token result:', error);
+                alert("An error occurred while uploading the image.");
+            });
+    } else {
+        console.log('User is not signed in or no file selected.');
+        alert("Please sign in and select a file to upload.");
+    }
+} //END OF SAVEIMAGE
+
 
     
     var currentUser = firebase.auth().currentUser;
