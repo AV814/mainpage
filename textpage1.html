@@ -57,7 +57,7 @@
     <br>
     <br>
     <p>
-        Version: 0.2.0
+        Version: 0.2.1
     </p>
 
     <input type="text" id="inputBox" placeholder="Enter Message">
@@ -163,8 +163,7 @@ function saveText() {
             var lineElement = document.createElement('p');
             lineElement.textContent = userMessage;
             var savedTextLines = document.getElementById('savedTextLines');
-            savedTextLines.insertBefore(userTime, savedTextLines.firstChild);
-            savedTextLines.insertBefore(userMessage, savedTextLines.firstChild);
+            //savedTextLines.insertBefore(userTime, savedTextLines.firstChild);
 
               // Clear the input box after submission
               document.getElementById('inputBox').value = '';
