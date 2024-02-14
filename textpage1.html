@@ -116,6 +116,14 @@
           }
         });
 
+            firebase.auth().onAuthStateChanged(function(user) {
+      updateUserAccount();
+
+      if (user) {
+        displayLines(); // Fetch and display the chat history
+      }
+        });
+
         function saveText() {
             var text = document.getElementById('inputBox').value;
 
