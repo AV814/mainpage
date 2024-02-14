@@ -57,7 +57,7 @@
     <br>
     <br>
     <p>
-        Version: 0.2.5
+        Version: 0.2.6
     </p>
 
     <input type="text" id="inputBox" placeholder="Enter Message">
@@ -191,12 +191,17 @@ function saveText() {
   savedTextLines.innerHTML = '';
 
   // Retrieve messages from Firebase
-  messagesRef.on('child_added', function(snapshot) {
-    var message = snapshot.val();
+  messagesRef.on('child_added', function (snapshot) {
+        var message = snapshot.val();
 
-    var lineElement = document.createElement('p');
-    lineElement.textContent = message;
-    savedTextLines.insertBefore(lineElement, savedTextLines.firstChild);
+        var userMessageElement = document.createElement('p');
+        userMessageElement.textContent = '[' + displayName + ']: ' + message.text;
+
+        var timeElement = document.createElement('p');
+        timeElement.textContent = '(' + message.time + ')';
+
+        savedTextLines.appendChild(userMessageElement);
+        savedTextLines.appendChild(timeElement);
   });
 }
 
