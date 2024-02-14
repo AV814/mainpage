@@ -193,12 +193,7 @@ function saveText() {
     var message = snapshot.val();
 
     var lineElement = document.createElement('p');
-    lineElement.textContent = message;
-
-    savedTextLines.insertBefore(lineElement, savedTextLines.firstChild);
-
-    var lineElement = document.createElement('p');
-    lineElement.textContent = messageTime;
+    lineElement.textContent = (message + '\n' + '(' + currentTime + ')');
 
     savedTextLines.insertBefore(lineElement, savedTextLines.firstChild);
   });
