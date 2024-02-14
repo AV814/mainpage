@@ -57,7 +57,7 @@
     <br>
     <br>
     <p>
-        Version: 1.0.4
+        Version: 1.0.5
     </p>
 
     <input type="text" id="inputBox" placeholder="Enter Message">
@@ -195,21 +195,19 @@ function saveText() {
     }
   }
 
-  function displayLines() {
+function displayLines() {
+  // Clear the existing messages
   var savedTextLines = document.getElementById('savedTextLines');
   savedTextLines.innerHTML = '';
 
+  // Retrieve messages from Firebase
   messagesRef.on('child_added', function(snapshot) {
     var message = snapshot.val();
 
     var lineElement = document.createElement('p');
-    lineElement.textContent = message.text; // Assuming 'text' is the key for user messages
+    lineElement.textContent = message;
 
-    var lineElementTime = document.createElement('p');
-    lineElementTime.textContent = message.time; // Assuming 'time' is the key for time messages
-
-    savedTextLines.appendChild(lineElement);
-    savedTextLines.appendChild(lineElementTime);
+    savedTextLines.insertBefore(lineElement, savedTextLines.firstChild);
   });
 }
 
