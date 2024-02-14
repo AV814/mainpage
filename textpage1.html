@@ -45,7 +45,7 @@
     <br>
     <br>
     <p>
-        Version: 2.0.0
+        Version: 2.0.1
     </p>
 
     <input type="text" id="inputBox" placeholder="Enter Message">
@@ -110,6 +110,12 @@
             }
         }
 
+        document.addEventListener("visibilitychange", function() {
+          if (document.visibilityState === 'visible') {
+            displayLines(); // Fetch and display the chat history when the page becomes visible
+          }
+        });
+
         function saveText() {
             var text = document.getElementById('inputBox').value;
 
@@ -122,6 +128,14 @@
                 minute: 'numeric',
                 second: 'numeric',
                 hour12: true,
+            });
+
+            firebase.auth().onAuthStateChanged(function(user) {
+              updateUserAccount();
+
+              if (user) {
+                displayLines(); // Fetch and display the chat history
+              }
             });
 
             var currentUser = firebase.auth().currentUser;
