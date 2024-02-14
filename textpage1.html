@@ -57,7 +57,7 @@
     <br>
     <br>
     <p>
-        Version: 0.1.3
+        Version: 0.1.4
     </p>
 
     <input type="text" id="inputBox" placeholder="Enter Message">
@@ -74,7 +74,7 @@
 
 
 
-
+var currentTime = new Date().toLocaleTimeString();
 var loggedInUsername = ''; // Variable to store the logged-in username
 
   // Update user account information
@@ -131,7 +131,6 @@ function updateUserAccount() {
 
 function saveText() {
     var text = document.getElementById('inputBox').value;
-    var currentTime = new Date().toLocaleTimeString();
     var currentUser = firebase.auth().currentUser;
 
     if (currentUser) {
