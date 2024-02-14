@@ -6,8 +6,6 @@
 
 <!-- CSS styles -->
 <style>
-    /* ... existing styles ... */
-
     #userAccount {
         position: absolute;
         top: 10px;
@@ -57,12 +55,15 @@
     <br>
     <br>
     <p>
-        Version: 1.1.5
+        Version: 1.1.6
     </p>
 
     <input type="text" id="inputBox" placeholder="Enter Message">
     <button onClick="saveText()"> Submit Text </button>
     <div id="savedTextLines"></div>
+
+    <input type="file" id="fileInput" accept="image/*">
+    <button onClick="saveImage()"> Upload Image </button>
 
     <!-- Add the Firebase SDK -->
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
