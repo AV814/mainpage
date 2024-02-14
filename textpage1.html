@@ -57,7 +57,7 @@
     <br>
     <br>
     <p>
-        Version: 0.1.9
+        Version: 0.2.0
     </p>
 
     <input type="text" id="inputBox" placeholder="Enter Message">
@@ -149,18 +149,22 @@ function saveText() {
           // User is signed in
           var displayName = idTokenResult.claims.name || 'Unknown User';
 
-          // Create the message string
-          var messageString = '[' + displayName + ']: ' + text + '<br>(' + currentTime + ')';
+        var userMessage = document.createElement('p');
+        userMessageElement.textContent = '[' + displayName + ']: ' + text;
+
+        var userTime = document.createElement('p');
+        timeElement.textContent = '(' + currentTime + ')';
 
           // Store the message string in Firebase
           var newMessageRef = messagesRef.push(); // Generate a new unique key for the message
-          newMessageRef.set(messageString)
+          newMessageRef.set(userMessage)
             .then(function() {
-              // Insert the new message at the top
-              var lineElement = document.createElement('p');
-              lineElement.textContent = messageString;
-              var savedTextLines = document.getElementById('savedTextLines');
-              //savedTextLines.insertBefore(lineElement, savedTextLines.firstChild);
+            // Insert the new message at the top
+            var lineElement = document.createElement('p');
+            lineElement.textContent = userMessage;
+            var savedTextLines = document.getElementById('savedTextLines');
+            savedTextLines.insertBefore(userTime, savedTextLines.firstChild);
+            savedTextLines.insertBefore(userMessage, savedTextLines.firstChild);
 
               // Clear the input box after submission
               document.getElementById('inputBox').value = '';
