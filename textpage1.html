@@ -45,7 +45,7 @@
     <br>
     <br>
     <p>
-        Version: 2.0.2
+        Version: 2.0.3
     </p>
 
     <input type="text" id="inputBox" placeholder="Enter Message" onkeydown="if(event.key==='Enter'){saveText()}">
@@ -109,20 +109,6 @@
                 document.getElementById('userAccount').textContent = 'Not logged in';
             }
         }
-
-        document.addEventListener("visibilitychange", function() {
-          if (document.visibilityState === 'visible') {
-            displayLines(); // Fetch and display the chat history when the page becomes visible
-          }
-        });
-
-            firebase.auth().onAuthStateChanged(function(user) {
-      updateUserAccount();
-
-      if (user) {
-        displayLines(); // Fetch and display the chat history
-      }
-        });
 
         function saveText() {
             var text = document.getElementById('inputBox').value;
