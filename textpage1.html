@@ -45,7 +45,7 @@
     <br>
     <br>
     <p>
-        Version: 2.1.1
+        Version: 2.1.2
     </p>
 
     <input type="text" id="inputBox" placeholder="Enter Message" onkeydown="if(event.key==='Enter'){saveText()}">
@@ -191,65 +191,42 @@
             .then(function (idTokenResult) {
                 var displayName = idTokenResult.claims.name || 'Unknown User';
 
-                var reader = new FileReader();
-                reader.onload = function (e) {
-                    var img = new Image();
-                    img.onload = function () {
-                        var canvas = document.createElement('canvas');
-                        var maxWidth = 800; // Set your maximum width
-                        var maxHeight = 600; // Set your maximum height
-                        var width = img.width;
-                        var height = img.height;
+                var storageRef = firebase.storage().ref();
+                var imagesRef = storageRef.child('images/' + file.name);
 
-                        if (width > height) {
-                            if (width > maxWidth) {
-                                height *= maxWidth / width;
-                                width = maxWidth;
-                            }
+                imagesRef.put(file)
+                    .then(function (snapshot) {
+                        return snapshot.ref.getDownloadURL();
+                    })
+                    .then(function (downloadURL) {
+                        var messageString;
+
+                        if (file.type.startsWith('image/')) {
+                            // If it's an image file
+                            messageString = '[' + displayName + ']: [Image] ' + downloadURL;
+                        } else if (file.type.startsWith('video/')) {
+                            // If it's a video file
+                            messageString = '[' + displayName + ']: [Video] ' + downloadURL;
                         } else {
-                            if (height > maxHeight) {
-                                width *= maxHeight / height;
-                                height = maxHeight;
-                            }
+                            // Assume other file types are treated as regular files
+                            messageString = '[' + displayName + ']: [File] ' + downloadURL;
                         }
 
-                        canvas.width = width;
-                        canvas.height = height;
-
-                        var ctx = canvas.getContext('2d');
-                        ctx.drawImage(img, 0, 0, width, height);
-
-                        canvas.toBlob(function (blob) {
-                            var storageRef = firebase.storage().ref();
-                            var imagesRef = storageRef.child('images/' + file.name);
-
-                            imagesRef.put(blob)
-                                .then(function (snapshot) {
-                                    return snapshot.ref.getDownloadURL();
-                                })
-                                .then(function (downloadURL) {
-                                    var messageString = '[' + displayName + ']: [Image] ' + downloadURL;
-
-                                    var newMessageRef = messagesRef.push();
-                                    newMessageRef.set(messageString)
-                                        .then(function () {
-                                            document.getElementById('fileInput').value = '';
-                                            displayLines();
-                                        })
-                                        .catch(function (error) {
-                                            console.error('Failed to save image message:', error);
-                                            alert("An error occurred while uploading the image.");
-                                        });
-                                })
-                                .catch(function (error) {
-                                    console.error('Failed to upload image:', error);
-                                    alert("An error occurred while uploading the image.");
-                                });
-                        });
-                    };
-                    img.src = e.target.result;
-                };
-                reader.readAsDataURL(file);
+                        var newMessageRef = messagesRef.push();
+                        newMessageRef.set(messageString)
+                            .then(function () {
+                                document.getElementById('fileInput').value = '';
+                                displayLines();
+                            })
+                            .catch(function (error) {
+                                console.error('Failed to save image message:', error);
+                                alert("An error occurred while uploading the image.");
+                            });
+                    })
+                    .catch(function (error) {
+                        console.error('Failed to upload image:', error);
+                        alert("An error occurred while uploading the image.");
+                    });
             })
             .catch(function (error) {
                 console.error('Failed to get ID token result:', error);
@@ -260,6 +237,7 @@
         alert("Please sign in and select a file to upload.");
     }
 }
+
 
 
 
