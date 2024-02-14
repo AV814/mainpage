@@ -12,9 +12,7 @@
             right: 10px;
             font-size: 14px;
         }
-    </style>
 
-    <style>
         #savedTextLines {
             line-height: 0.5;
         }
@@ -37,13 +35,6 @@
     <p id="loggedInAccount"></p>
     <hr>
 
-    <style>
-        .vl {
-            border-left: 6px solid green;
-            height: 500px;
-        }
-    </style>
-
     <t>Don't have a ChairFans Account? </t>
     <a href="https://chairfansltd.online/create-account" style="color:rgb(255, 203, 59); text-align: center">Create One</a>
     <br>
@@ -54,7 +45,7 @@
     <br>
     <br>
     <p>
-        Version: 1.1.7
+        Version: 1.2.0
     </p>
 
     <input type="text" id="inputBox" placeholder="Enter Message">
@@ -77,10 +68,10 @@
             var currentUser = firebase.auth().currentUser;
 
             if (currentUser) {
-                loggedInUsername = currentUser.displayName || 'Unknown User'; // Store the logged-in username
+                loggedInUsername = currentUser.displayName || 'Unknown User';
                 document.getElementById('userAccount').textContent = 'Logged in as: ' + loggedInUsername;
             } else {
-                loggedInUsername = ''; // Reset the variable if the user is not logged in
+                loggedInUsername = '';
                 document.getElementById('userAccount').textContent = 'Not logged in';
             }
         }
@@ -111,10 +102,10 @@
             var currentUser = firebase.auth().currentUser;
 
             if (currentUser) {
-                currentUsername = currentUser.displayName || ''; // Store the display name in the variable
+                currentUsername = currentUser.displayName || '';
                 document.getElementById('userAccount').textContent = 'Logged in as: ' + currentUsername;
             } else {
-                currentUsername = ''; // Reset the variable if the user is not logged in
+                currentUsername = '';
                 document.getElementById('userAccount').textContent = 'Not logged in';
             }
         }
@@ -140,15 +131,27 @@
                     .then(function (idTokenResult) {
                         var displayName = idTokenResult.claims.name || 'Unknown User';
 
-                        var storageRef = firebase.storage().ref();
-
                         var newMessageRefBlank = messagesRefBlank.push();
-                        newMessageRefBlank.set('‎');
-
                         var newMessageRefTime = messagesRefTime.push();
-                        newMessageRefTime.set('(' + currentTime + ')');
-
                         var newMessageRef = messagesRef.push();
+
+                        newMessageRefBlank.set('‎')
+                            .then(function () {
+                                document.getElementById('inputBox').value = '';
+                            })
+                            .catch(function (error) {
+                                console.error('Failed to save message:', error);
+                                alert("An error occurred while sending the message.");
+                            });
+
+                        newMessageRefTime.set(currentTime)
+                            .then(function () {
+                                document.getElementById('inputBox').value = '';
+                            })
+                            .catch(function (error) {
+                                console.error('Failed to save message:', error);
+                                alert("An error occurred while sending the message.");
+                            });
 
                         newMessageRef.set('[' + displayName + ']: ' + text)
                             .then(function () {
@@ -190,16 +193,29 @@
                             })
                             .then(function (downloadURL) {
                                 var newMessageRefBlank = messagesRefBlank.push();
-                                newMessageRefBlank.set('‎');
-
                                 var newMessageRefTime = messagesRefTime.push();
-                                newMessageRefTime.set('(' + new Date().toLocaleString() + ')');
-
                                 var newMessageRef = messagesRef.push();
+
+                                newMessageRefBlank.set('‎')
+                                    .then(function () {
+                                        document.getElementById('fileInput').value = '';
+                                    })
+                                    .catch(function (error) {
+                                        console.error('Failed to save image message:', error);
+                                        alert("An error occurred while uploading the image.");
+                                    });
+
+                                newMessageRefTime.set(new Date().toLocaleString())
+                                    .then(function () {
+                                        document.getElementById('fileInput').value = '';
+                                    })
+                                    .catch(function (error) {
+                                        console.error('Failed to save image message:', error);
+                                        alert("An error occurred while uploading the image.");
+                                    });
 
                                 newMessageRef.set('[' + displayName + ']: [Image] ' + downloadURL)
                                     .then(function () {
-                                        document.getElementById('fileInput').value = '';
                                         displayLines();
                                     })
                                     .catch(function (error) {
@@ -223,27 +239,35 @@
         }
 
         function displayLines() {
-            // Clear the existing messages
             var savedTextLines = document.getElementById('savedTextLines');
             savedTextLines.innerHTML = '';
 
-            // Retrieve messages from Firebase
             messagesRef.on('child_added', function (snapshot) {
                 var message = snapshot.val();
-
                 var lineElement = document.createElement('p');
-                lineElement.textContent = message;
+
+                if (message.includes('[Image]')) {
+                    var imgElement = document.createElement('img');
+                    imgElement.src = extractImageUrl(message);
+                    lineElement.appendChild(imgElement);
+                } else {
+                    lineElement.textContent = message;
+                }
 
                 savedTextLines.insertBefore(lineElement, savedTextLines.firstChild);
             });
         }
 
-        // Listen for authentication state changes
+        function extractImageUrl(message) {
+            var matches = message.match(/\[Image\]\s*(https:\/\/[^\s]+)/);
+            return matches ? matches[1] : '';
+        }
+
         firebase.auth().onAuthStateChanged(function (user) {
             updateUserAccount();
 
             if (user) {
-                displayLines(); // Fetch and display the chat history
+                displayLines();
             }
         });
     </script>
