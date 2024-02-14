@@ -45,7 +45,7 @@
     <br>
     <br>
     <p>
-        Version: 2.0.7
+        Version: 2.0.8
     </p>
 
     <input type="text" id="inputBox" placeholder="Enter Message" onkeydown="if(event.key==='Enter'){saveText()}">
@@ -272,9 +272,19 @@ function displayLines() {
     messagesRef.on('value', function (snapshot) {
         snapshot.forEach(function (childSnapshot) {
             var message = childSnapshot.val();
-
             var lineElement = document.createElement('p');
-            lineElement.textContent = message;
+
+            if (message.includes('[Image]')) {
+                // If the message contains '[Image]', treat it as an image and create an img element
+                var imageUrl = message.split('[Image] ')[1];
+                var imgElement = document.createElement('img');
+                imgElement.src = imageUrl;
+                imgElement.alt = 'Image';
+                lineElement.appendChild(imgElement);
+            } else {
+                // If it's a regular text message, display it as text
+                lineElement.textContent = message;
+            }
 
             savedTextLines.appendChild(lineElement);
         });
