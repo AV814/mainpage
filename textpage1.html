@@ -45,10 +45,10 @@
     <br>
     <br>
     <p>
-        Version: 2.0.1
+        Version: 2.0.2
     </p>
 
-    <input type="text" id="inputBox" placeholder="Enter Message">
+    <input type="text" id="inputBox" placeholder="Enter Message" onkeydown="if(event.key==='Enter'){saveText()}">
     <button onClick="saveText()"> Submit Text </button>
     <input type="file" id="fileInput" accept="image/*">
     <button onClick="saveImage()"> Upload Image </button>
