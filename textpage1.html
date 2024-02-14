@@ -45,7 +45,7 @@
     <br>
     <br>
     <p>
-        Version: 2.1.0
+        Version: 2.1.1
     </p>
 
     <input type="text" id="inputBox" placeholder="Enter Message" onkeydown="if(event.key==='Enter'){saveText()}">
@@ -274,30 +274,34 @@ function displayLines() {
             var message = childSnapshot.val();
             var lineElement = document.createElement('p');
 
-            if (message.includes('[Image]')) {
-                // If the message contains '[Image]', treat it as an image and create an img or video element
-                var imageUrl = message.split('[Image] ')[1];
-                
-                // Determine if the URL is for an image or a video
-                if (imageUrl.match(/\.(jpeg|jpg|gif|png)$/) != null) {
-                    var imgElement = document.createElement('img');
-                    imgElement.src = imageUrl;
-                    imgElement.alt = 'Image';
-                    lineElement.appendChild(imgElement);
-                } else if (imageUrl.match(/\.(mp4|ogg|webm)$/) != null) {
-                    var videoElement = document.createElement('video');
-                    videoElement.src = imageUrl;
-                    videoElement.controls = true;
-                    lineElement.appendChild(videoElement);
-                } else {
-                    // Unsupported file type
-                    lineElement.textContent = 'Unsupported file type';
-                }
+            if (message.startsWith('[Image]')) {
+                // If the message starts with '[Image]', treat it as an image and create an img element
+                var imageUrl = message.substring('[Image]'.length).trim();
+
+                // Create an img element
+                var imgElement = document.createElement('img');
+                imgElement.src = imageUrl;
+                imgElement.alt = 'Image';
+
+                // Append the img element to the line element
+                lineElement.appendChild(imgElement);
+            } else if (message.startsWith('[Video]')) {
+                // If the message starts with '[Video]', treat it as a video and create a video element
+                var videoUrl = message.substring('[Video]'.length).trim();
+
+                // Create a video element
+                var videoElement = document.createElement('video');
+                videoElement.src = videoUrl;
+                videoElement.controls = true;
+
+                // Append the video element to the line element
+                lineElement.appendChild(videoElement);
             } else {
                 // If it's a regular text message, display it as text
                 lineElement.textContent = message;
             }
 
+            // Append the line element to the savedTextLines div
             savedTextLines.insertBefore(lineElement, savedTextLines.firstChild);
         });
     });
