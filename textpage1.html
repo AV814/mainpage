@@ -57,7 +57,7 @@
     <br>
     <br>
     <p>
-        Version: 1.0.5
+        Version: 1.0.6
     </p>
 
     <input type="text" id="inputBox" placeholder="Enter Message">
@@ -144,16 +144,19 @@ function saveText() {
           // Create the message string
           var messageString = '[' + displayName + ']: ' + text;
           var messageTime = '(' + currentTime + ')';
+          var messageBlank = ' ';
 
           // Store the message string in Firebase
           var newMessageRef = messagesRef.push(); // Generate a new unique key for the message TEXT
           var newMessageRefTime = messagesRefTime.push(); // Generate a new unique key for the message TIME
-          newMessageRef.set(messageString)
+          var newMessageRefBlank = messagesRefBlank.push(); // Generate a new unique key for the message TIME
+
+          newMessageRefBlank.set(messageBlank)
             .then(function() {
               // Insert the new message at the top
-              var lineElement = document.createElement('p');
-              lineElement.textContent = messageString;
-              var savedTextLines = document.getElementById('savedTextLines');
+              var lineElementBlank = document.createElement('p');
+              lineElementBlank.textContent = messageBlank;
+              var savedTextLinesBlank = document.getElementById('savedTextLinesBlank');
               //savedTextLines.insertBefore(lineElement, savedTextLines.firstChild);
 
               // Clear the input box after submission
@@ -164,14 +167,28 @@ function saveText() {
               alert("An error occurred while sending the message.");
             });
 
-
-
             newMessageRefTime.set(messageTime)
             .then(function() {
               // Insert the new message at the top
               var lineElementTime = document.createElement('p');
               lineElementTime.textContent = messageTime;
               var savedTextLinesTime = document.getElementById('savedTextLinesTime');
+              //savedTextLines.insertBefore(lineElement, savedTextLines.firstChild);
+
+              // Clear the input box after submission
+              document.getElementById('inputBox').value = '';
+            })
+            .catch(function(error) {
+              console.error('Failed to save message:', error);
+              alert("An error occurred while sending the message.");
+            });
+
+            newMessageRef.set(messageString)
+            .then(function() {
+              // Insert the new message at the top
+              var lineElement = document.createElement('p');
+              lineElement.textContent = messageString;
+              var savedTextLines = document.getElementById('savedTextLines');
               //savedTextLines.insertBefore(lineElement, savedTextLines.firstChild);
 
               // Clear the input box after submission
