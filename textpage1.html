@@ -286,7 +286,7 @@ function displayLines() {
                 lineElement.textContent = message;
             }
 
-            savedTextLines.appendChild(lineElement);
+            savedTextLines.insertBefore(lineElement, savedTextLines.firstChild);
         });
     });
 }
