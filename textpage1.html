@@ -156,10 +156,12 @@ function saveText() {
           var newMessageRef = messagesRef.push(); // Generate a new unique key for the message
           newMessageRef.set(messageString)
             .then(function() {
-              // Insert the new message at the top
-              var lineElement = document.createElement('p');
-              lineElement.textContent = messageString;
-              var savedTextLines = document.getElementById('savedTextLines');
+            // Insert the new message at the top
+            var lineElement = document.createElement('p');
+            lineElement.textContent = messageString;
+            var savedTextLines = document.getElementById('savedTextLines');
+            savedTextLines.prepend(lineElement);
+                
               //savedTextLines.insertBefore(lineElement, savedTextLines.firstChild);
 
               // Clear the input box after submission
