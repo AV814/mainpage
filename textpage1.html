@@ -57,10 +57,10 @@
     <br>
     <br>
     <p>
-        Version: 0.2.8
+        Version: 1.0.0
     </p>
 
-    <input type="text" id="inputBox" placeholder="Enter Message">
+    <input type="text" id="inputBox" placeholder="put some text here i guess">
     <button onClick="saveText()"> Submit Text </button>
     <div id="savedTextLines"></div>
 
@@ -74,16 +74,6 @@
 
 
 
-var currentTime = new Date().toLocaleTimeString(undefined, {
-  weekday: 'long', // or 'short' or 'narrow'
-  year: 'numeric',
-  month: 'long', // or 'short' or 'narrow'
-  day: 'numeric',
-  hour: 'numeric',
-  minute: 'numeric',
-  second: 'numeric',
-  hour12: true, // Set to false if you want 24-hour format
-});
 
 var loggedInUsername = ''; // Variable to store the logged-in username
 
@@ -120,6 +110,7 @@ var loggedInUsername = ''; // Variable to store the logged-in username
 
         var database = firebase.database();
         var messagesRef = database.ref("messages");
+        var messagesRefTime = database.ref("times");
 
 
         var currentUsername = ''; // Variable to store the current username
@@ -137,68 +128,87 @@ function updateUserAccount() {
   }
 }
 
+
+
 function saveText() {
     var text = document.getElementById('inputBox').value;
+    var currentTime = new Date().toLocaleTimeString();
     var currentUser = firebase.auth().currentUser;
 
     if (currentUser) {
-        currentUser.getIdToken(/* forceRefresh */ true)
-            .then(function (idToken) {
-                // User is signed in
-                var decodedToken = firebase.auth().currentUser.getIdTokenResult();
+      currentUser.getIdTokenResult()
+        .then(function(idTokenResult) {
+          // User is signed in
+          var displayName = idTokenResult.claims.name || 'Unknown User';
 
-                decodedToken.then((result) => {
-                    var displayName = result.claims.name || 'Unknown User';
+          // Create the message string
+          var messageString = '[' + displayName + ']: ' + text;
+          var messageTime = '(' + currentTime + ')';
 
-                    // Create the message object
-                    var messageObject = {
-                        text: text,
-                        time: currentTime
-                    };
+          // Store the message string in Firebase
+          var newMessageRef = messagesRef.push(); // Generate a new unique key for the message TEXT
+          var newMessageRefTime = messagesRefTime.push(); // Generate a new unique key for the message TIME
+          newMessageRef.set(messageString)
+            .then(function() {
+              // Insert the new message at the top
+              var lineElement = document.createElement('p');
+              lineElement.textContent = messageString;
+              var savedTextLines = document.getElementById('savedTextLines');
+              //savedTextLines.insertBefore(lineElement, savedTextLines.firstChild);
 
-                    // Store the message object in Firebase
-                    var newMessageRef = messagesRef.push(); // Generate a new unique key for the message
-                    newMessageRef.set(messageObject)
-                        .then(function () {
-                            // Clear the input box after submission
-                            document.getElementById('inputBox').value = '';
-                        })
-                        .catch(function (error) {
-                            console.error('Failed to save message:', error);
-                            alert("An error occurred while sending the message.");
-                        });
-                });
+              // Clear the input box after submission
+              document.getElementById('inputBox').value = '';
             })
-            .catch(function (error) {
-                console.error('Failed to get ID token:', error);
-                alert("An error occurred while sending the message.");
+            .catch(function(error) {
+              console.error('Failed to save message:', error);
+              alert("An error occurred while sending the message.");
             });
+
+
+
+            newMessageRefTime.set(messageTime)
+            .then(function() {
+              // Insert the new message at the top
+              var lineElement = document.createElement('p');
+              lineElement.textContent = messageTime;
+              var savedTextLines = document.getElementById('savedTextLines');
+              //savedTextLines.insertBefore(lineElement, savedTextLines.firstChild);
+
+              // Clear the input box after submission
+              document.getElementById('inputBox').value = '';
+            })
+            .catch(function(error) {
+              console.error('Failed to save message:', error);
+              alert("An error occurred while sending the message.");
+            });
+
+
+        })
+        .catch(function(error) {
+          console.error('Failed to get ID token result:', error);
+          alert("An error occurred while sending the message.");
+        });
     } else {
-        // User is not signed in, handle appropriately (e.g., display an error message)
-        console.log('User is not signed in. Message submission not allowed.');
-        alert("Please sign in to send a message.");
+      // User is not signed in, handle appropriately (e.g., display an error message)
+      console.log('User is not signed in. Message submission not allowed.');
+      alert("Please sign in to send a message.");
     }
-}
+  }
 
+  function displayLines() {
+  // Clear the existing messages
+  var savedTextLines = document.getElementById('savedTextLines');
+  savedTextLines.innerHTML = '';
 
-function displayLines() {
-    // Clear the existing messages
-    var savedTextLines = document.getElementById('savedTextLines');
-    savedTextLines.innerHTML = '';
+  // Retrieve messages from Firebase
+  messagesRef.on('child_added', function(snapshot) {
+    var message = snapshot.val();
 
-    // Retrieve messages from Firebase
-    messagesRef.on('child_added', function (snapshot) {
-        var message = snapshot.val();
+    var lineElement = document.createElement('p');
+    lineElement.textContent = message;
 
-        var userMessageElement = document.createElement('p');
-        userMessageElement.textContent = '[' + currentDisplayName + ']: ' + message.text;
-
-        var timeElement = document.createElement('p');
-        timeElement.textContent = '(' + message.time + ')';
-
-        savedTextLines.appendChild(userMessageElement);
-        savedTextLines.appendChild(timeElement);
-    });
+    savedTextLines.insertBefore(lineElement, savedTextLines.firstChild);
+  });
 }
 
 // Listen for authentication state changes
