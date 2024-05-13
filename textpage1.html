@@ -51,7 +51,7 @@
     <br>
     <br>
     <p>
-        Version: 2.1.6
+        Version: 2.1.4
     </p>
 
     <input type="text" id="inputBox" placeholder="Enter Message" onkeydown="if(event.key==='Enter'){saveText()}">
@@ -245,75 +245,63 @@
 }
 
 
+
+
 function displayLines() {
     // Clear the existing messages
     var savedTextLines = document.getElementById('savedTextLines');
     savedTextLines.innerHTML = '';
 
     // Retrieve messages from Firebase
-    messagesRef.once('value')
-        .then(function(snapshot) {
-            snapshot.forEach(function(childSnapshot) {
-                var message = childSnapshot.val();
-                appendMessage(message);
-            });
-        })
-        .catch(function(error) {
-            console.error('Error fetching messages:', error);
+    messagesRef.on('value', function (snapshot) {
+        snapshot.forEach(function (childSnapshot) {
+            var message = childSnapshot.val();
+            var lineElement = document.createElement('p');
+
+            // Check if the message contains an image URL
+            var imageUrl = extractImageUrl(message);
+            if (imageUrl) {
+                // If the message contains an image URL, create an img element
+                var imgElement = document.createElement('img');
+                imgElement.src = imageUrl;
+                imgElement.alt = 'Image';
+
+                // Append the img element to the line element
+                lineElement.appendChild(imgElement);
+            } else {
+                // If it's a regular text message, display it as text
+                var messageText = message;
+                var timeElement = document.createElement('span');
+                timeElement.classList.add('message-time'); // Add a class to style the time
+
+                // Extract the time information from the message
+                var timeIndex = message.lastIndexOf('(');
+                if (timeIndex !== -1) {
+                    var timeInfo = message.substring(timeIndex);
+                    messageText = message.substring(0, timeIndex);
+
+                    // Set the time information as the content of the time element
+                    timeElement.textContent = timeInfo;
+
+                    // Style the time element
+                    timeElement.style.fontSize = 'smaller'; // Smaller font size
+                    timeElement.style.color = 'gray'; // Different color
+                }
+
+                // Set the message text
+                lineElement.textContent = messageText;
+
+                // Append the time element after the message text
+                lineElement.appendChild(timeElement);
+            }
+
+            // Append the line element to the savedTextLines div
+            savedTextLines.insertBefore(lineElement, savedTextLines.firstChild);
         });
+    });
 }
 
 
-function appendMessage(message) {
-    var lineElement = document.createElement('p');
-
-    // Check if the message contains an image URL
-    var imageUrl = extractImageUrl(message);
-    if (imageUrl) {
-        // If the message contains an image URL, create an img element
-        var imgElement = document.createElement('img');
-        imgElement.src = imageUrl;
-        imgElement.alt = 'Image';
-
-        // Append the img element to the line element
-        lineElement.appendChild(imgElement);
-    } else {
-        // If it's a regular text message, display it as text
-        var messageText = message;
-        var timeElement = document.createElement('span');
-        timeElement.classList.add('message-time'); // Add a class to style the time
-
-        // Extract the time information from the message
-        var timeIndex = message.lastIndexOf('(');
-        if (timeIndex !== -1) {
-            var timeInfo = message.substring(timeIndex);
-            messageText = message.substring(0, timeIndex);
-
-            // Set the time information as the content of the time element
-            timeElement.textContent = timeInfo;
-
-            // Style the time element
-            timeElement.style.fontSize = 'smaller'; // Smaller font size
-            timeElement.style.color = 'gray'; // Different color
-        }
-
-        // Set the message text
-        lineElement.textContent = messageText;
-
-        // Append the time element after the message text
-        lineElement.appendChild(timeElement);
-    }
-
-    // Append the line element to the savedTextLines div
-    var savedTextLines = document.getElementById('savedTextLines');
-    savedTextLines.appendChild(lineElement);
-}
-
-// Function to extract image URL from message
-function extractImageUrl(message) {
-    var matches = message.match(/\[Image\]\s*(https?:\/\/[^\s]+)/);
-    return matches ? matches[1] : '';
-}
 
 
         // Function to extract image URL from message
