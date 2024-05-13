@@ -45,7 +45,7 @@
     <br>
     <br>
     <p>
-        Version: 2.1.2
+        Version: 2.1.3
     </p>
 
     <input type="text" id="inputBox" placeholder="Enter Message" onkeydown="if(event.key==='Enter'){saveText()}">
@@ -252,28 +252,16 @@ function displayLines() {
             var message = childSnapshot.val();
             var lineElement = document.createElement('p');
 
-            if (message.startsWith('[Image]')) {
-                // If the message starts with '[Image]', treat it as an image and create an img element
-                var imageUrl = message.substring('[Image]'.length).trim();
-
-                // Create an img element
+            // Check if the message contains an image URL
+            var imageUrl = extractImageUrl(message);
+            if (imageUrl) {
+                // If the message contains an image URL, create an img element
                 var imgElement = document.createElement('img');
                 imgElement.src = imageUrl;
                 imgElement.alt = 'Image';
 
                 // Append the img element to the line element
                 lineElement.appendChild(imgElement);
-            } else if (message.startsWith('[Video]')) {
-                // If the message starts with '[Video]', treat it as a video and create a video element
-                var videoUrl = message.substring('[Video]'.length).trim();
-
-                // Create a video element
-                var videoElement = document.createElement('video');
-                videoElement.src = videoUrl;
-                videoElement.controls = true;
-
-                // Append the video element to the line element
-                lineElement.appendChild(videoElement);
             } else {
                 // If it's a regular text message, display it as text
                 lineElement.textContent = message;
@@ -287,10 +275,11 @@ function displayLines() {
 
 
 
-        function extractImageUrl(message) {
-            var matches = message.match(/\[Image\]\s*(https:\/\/[^\s]+)/);
-            return matches ? matches[1] : '';
-        }
+        // Function to extract image URL from message
+    function extractImageUrl(message) {
+        var matches = message.match(/\[Image\]\s*(https?:\/\/[^\s]+)/);
+        return matches ? matches[1] : '';
+    }
 
         firebase.auth().onAuthStateChanged(function (user) {
             updateUserAccount();
