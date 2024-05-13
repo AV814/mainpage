@@ -51,7 +51,7 @@
     <br>
     <br>
     <p>
-        Version: 2.1.5
+        Version: 2.1.4
     </p>
 
     <input type="text" id="inputBox" placeholder="Enter Message" onkeydown="if(event.key==='Enter'){saveText()}">
@@ -296,7 +296,7 @@ function displayLines() {
             }
 
             // Append the line element to the savedTextLines div
-            savedTextLines.insertBefore(lineElement);
+            savedTextLines.insertBefore(lineElement, savedTextLines.firstChild);
         });
     });
 }
