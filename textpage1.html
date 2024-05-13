@@ -253,8 +253,8 @@ function displayLines() {
     savedTextLines.innerHTML = '';
 
     // Retrieve messages from Firebase
-    messagesRef.on('value', function (snapshot) {
-        snapshot.forEach(function (childSnapshot) {
+    messagesRef.once('value', function(snapshot) {
+        snapshot.forEach(function(childSnapshot) {
             var message = childSnapshot.val();
             var lineElement = document.createElement('p');
 
@@ -296,10 +296,11 @@ function displayLines() {
             }
 
             // Append the line element to the savedTextLines div
-            savedTextLines.insertBefore(lineElement, savedTextLines.firstChild);
+            savedTextLines.appendChild(lineElement);
         });
     });
 }
+
 
 
 
