@@ -30,3 +30,33 @@ signInForm.addEventListener('submit', function(event) {
       // Display error message to the user
     });
 });
+
+
+
+
+
+// Function to fetch user information from Firebase
+function fetchUserInfo(userId) {
+  return firebase.database().ref('users/' + userId).once('value').then(snapshot => {
+      return snapshot.val();
+  });
+}
+
+// Function to render user profile page
+function renderUserProfile(userId) {
+  fetchUserInfo(userId).then(userInfo => {
+      // Replace placeholders with user information
+      const username = userInfo.username;
+      const profilePicture = userInfo.profilePicture;
+      const bio = userInfo.bio;
+
+      // Update HTML elements with user information
+      document.getElementById('username').innerText = username;
+      document.getElementById('profile-picture').src = profilePicture;
+      document.getElementById('bio').innerText = bio;
+  });
+}
+
+// Assume userId is obtained from Firebase Authentication
+const userId = 'user123'; // Replace with actual user ID
+renderUserProfile(userId);
