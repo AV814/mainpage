@@ -51,7 +51,7 @@
     <br>
     <br>
     <p>
-        Version: 2.1.7
+        Version: 2.1.8
     </p>
 
     <input type="text" id="inputBox" placeholder="Enter Message" onkeydown="if(event.key==='Enter'){saveText()}">
@@ -301,9 +301,18 @@ function displayLines() {
     });
 }
 
+firebase.auth().onAuthStateChanged(function(user) {
+    updateUserAccount();
+
+    if (user) {
+        displayLines(); // Initial display of chat history
+    }
+});
 
 
 
+
+        
         // Function to extract image URL from message
     function extractImageUrl(message) {
         var matches = message.match(/\[Image\]\s*(https?:\/\/[^\s]+)/);
