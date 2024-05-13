@@ -51,7 +51,7 @@
     <br>
     <br>
     <p>
-        Version: 2.1.6
+        Version: 2.1.7
     </p>
 
     <input type="text" id="inputBox" placeholder="Enter Message" onkeydown="if(event.key==='Enter'){saveText()}">
@@ -252,8 +252,8 @@ function displayLines() {
     var savedTextLines = document.getElementById('savedTextLines');
     savedTextLines.innerHTML = '';
 
-    // Retrieve messages from Firebase
-    messagesRef.once('value', function(snapshot) {
+    // Retrieve messages from Firebase and set up a listener for real-time updates
+    messagesRef.on('value', function(snapshot) {
         snapshot.forEach(function(childSnapshot) {
             var message = childSnapshot.val();
             var lineElement = document.createElement('p');
@@ -300,8 +300,6 @@ function displayLines() {
         });
     });
 }
-
-
 
 
 
