@@ -45,7 +45,7 @@
     <br>
     <br>
     <p>
-        Version: 2.1.4
+        Version: 2.1.5
     </p>
 
     <input type="text" id="inputBox" placeholder="Enter Message" onkeydown="if(event.key==='Enter'){saveText()}">
@@ -181,14 +181,12 @@
             }
         }
 
-        function saveImage() {
+    function saveImage() {
     var fileInput = document.getElementById('fileInput');
     var file = fileInput.files[0];
     var currentUser = firebase.auth().currentUser;
 
     if (currentUser && file) {
-        console.log('File selected:', file);
-
         currentUser.getIdTokenResult()
             .then(function (idTokenResult) {
                 var displayName = idTokenResult.claims.name || 'Unknown User';
@@ -198,25 +196,20 @@
 
                 imagesRef.put(file)
                     .then(function (snapshot) {
-                        console.log('Image uploaded successfully:', snapshot);
-
                         return snapshot.ref.getDownloadURL();
                     })
                     .then(function (downloadURL) {
-                        console.log('Download URL:', downloadURL);
-
                         var messageString = '[' + displayName + ']: [Image] ' + downloadURL;
 
                         var newMessageRef = messagesRef.push();
                         newMessageRef.set(messageString)
                             .then(function () {
-                                console.log('Message saved successfully');
                                 document.getElementById('fileInput').value = '';
                                 displayLines();
                             })
                             .catch(function (error) {
                                 console.error('Failed to save image message:', error);
-                                alert("An error occurred while uploading the image.");
+                                alert("An error occurred while saving the image message.");
                             });
                     })
                     .catch(function (error) {
@@ -233,6 +226,7 @@
         alert("Please sign in and select a file to upload.");
     }
 }
+
 
 
 
