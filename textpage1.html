@@ -3,8 +3,6 @@
 
 <head>
     <title>Chair Fans Chat Room</title>
-
-    <!-- CSS styles -->
     <style>
         #userAccount {
             position: absolute;
@@ -18,9 +16,8 @@
             color: gray;
         }
 
-
         #savedTextLines {
-            line-height: 0.5;
+            line-height: 1.4;
         }
 
         #savedTextLines p {
@@ -32,6 +29,18 @@
             text-align: left;
             color: white;
         }
+
+        img {
+            max-width: 300px;
+            display: block;
+            margin-top: 5px;
+        }
+
+        video {
+            max-width: 300px;
+            display: block;
+            margin-top: 5px;
+        }
     </style>
 </head>
 
@@ -41,47 +50,29 @@
     <p id="loggedInAccount"></p>
     <hr>
 
-    <t>Don't have a ChairFans Account? </t>
-    <a href="https://chairfansltd.online/create-account" style="color:rgb(255, 203, 59); text-align: center">Create One</a>
-    <br>
-    <t>Already have a ChairFans Account? If not signed in already, </t>
-    <a href="https://chairfansltd.online/sign-in" style="color:rgb(255, 203, 59); text-align: center">Sign In</a>
-    <br>
-    <a href="https://chairfansltd.online/" style="color:rgb(255, 203, 59); text-align: center">Go back to Main Page</a>
-    <br>
-    <br>
-    <p>
-        Version: 2.1.4
-    </p>
+    <p>Don't have a ChairFans Account? <a href="https://chairfansltd.online/create-account" style="color:rgb(255, 203, 59);">Create One</a></p>
+    <p>Already have a ChairFans Account? <a href="https://chairfansltd.online/sign-in" style="color:rgb(255, 203, 59);">Sign In</a></p>
+    <p><a href="https://chairfansltd.online/" style="color:rgb(255, 203, 59);">Go back to Main Page</a></p>
+
+    <p>Version: 2.1.4</p>
 
     <input type="text" id="inputBox" placeholder="Enter Message" onkeydown="if(event.key==='Enter'){saveText()}">
-    <button onClick="saveText()"> Submit Text </button>
-    <input type="file" id="fileInput" accept="image/*,video/*">
-    <button onClick="saveImage()"> Upload Image </button>
-    <div id="savedTextLines"></div>
+    <button onclick="saveText()">Submit Text</button>
 
-    <!-- Add the Firebase SDK -->
+    <input type="file" id="fileInput" accept="image/*,video/*">
+    <button onclick="saveMedia()">Upload Image/Video</button>
+
+    <div id="savedTextLines"></div>
+    <div id="userAccount"></div>
+
+    <!-- Firebase SDK -->
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-storage.js"></script>
 
     <script>
-        var loggedInUsername = ''; // Variable to store the logged-in username
-
-        // Update user account information
-        function updateUserAccount() {
-            var currentUser = firebase.auth().currentUser;
-
-            if (currentUser) {
-                loggedInUsername = currentUser.displayName || 'Unknown User';
-                document.getElementById('userAccount').textContent = 'Logged in as: ' + loggedInUsername;
-            } else {
-                loggedInUsername = '';
-                document.getElementById('userAccount').textContent = 'Not logged in';
-            }
-        }
-
+        // Firebase config
         var firebaseConfig = {
             apiKey: "AIzaSyByOJEl2Q5NX5OsuZ2yobTUXlElx0VSooY",
             authDomain: "textpage1-chair.firebaseapp.com",
@@ -95,232 +86,131 @@
 
         // Initialize Firebase
         firebase.initializeApp(firebaseConfig);
-
         var database = firebase.database();
         var messagesRef = database.ref("messages");
-        var messagesRefTime = database.ref("messages");
-        var messagesRefBlank = database.ref("messages");
 
-        var currentUsername = ''; // Variable to store the current username
-
-        // Update user account information
+        // Display current user info
         function updateUserAccount() {
             var currentUser = firebase.auth().currentUser;
-
             if (currentUser) {
-                currentUsername = currentUser.displayName || '';
-                document.getElementById('userAccount').textContent = 'Logged in as: ' + currentUsername;
+                document.getElementById('userAccount').textContent = 'Logged in as: ' + (currentUser.displayName || 'Unknown User');
             } else {
-                currentUsername = '';
                 document.getElementById('userAccount').textContent = 'Not logged in';
             }
         }
 
+        // Save text message
         function saveText() {
-            var text = document.getElementById('inputBox').value;
-
-            var currentTime = new Date().toLocaleString(undefined, {
-                year: 'numeric',
-                month: 'short',
-                weekday: 'narrow',
-                day: 'numeric',
-                hour: 'numeric',
-                minute: 'numeric',
-                hour12: true,
-            });
-
-            firebase.auth().onAuthStateChanged(function(user) {
-              updateUserAccount();
-
-              if (user) {
-                displayLines(); // Fetch and display the chat history
-              }
-            });
-
+            var text = document.getElementById('inputBox').value.trim();
             var currentUser = firebase.auth().currentUser;
 
+            if (!text) return;
+
             if (currentUser) {
-                currentUser.getIdTokenResult()
-                    .then(function (idTokenResult) {
-                        var displayName = idTokenResult.claims.name || 'Unknown User';
+                var displayName = currentUser.displayName || 'Unknown User';
+                var currentTime = new Date().toLocaleString(undefined, {
+                    year: 'numeric',
+                    month: 'short',
+                    weekday: 'narrow',
+                    day: 'numeric',
+                    hour: 'numeric',
+                    minute: 'numeric',
+                    hour12: true,
+                });
 
-                        var newMessageRefBlank = messagesRefBlank.push();
-                        var newMessageRefTime = messagesRefTime.push();
-                        var newMessageRef = messagesRef.push();
-
-                        newMessageRefBlank.set('‎')
-                            .then(function () {
-                                document.getElementById('inputBox').value = '';
-                            })
-                            .catch(function (error) {
-                                console.error('Failed to save message:', error);
-                                alert("An error occurred while sending the message.");
-                            });
-
-                        newMessageRefTime.set('(' + currentTime + ')')
-                            .then(function () {
-                                document.getElementById('inputBox').value = '';
-                            })
-                            .catch(function (error) {
-                                console.error('Failed to save message:', error);
-                                alert("An error occurred while sending the message.");
-                            });
-
-                        newMessageRef.set('[' + displayName + ']: ' + text)
-                            .then(function () {
-                                document.getElementById('inputBox').value = '';
-                                displayLines();
-                            })
-                            .catch(function (error) {
-                                console.error('Failed to save message:', error);
-                                alert("An error occurred while sending the message.");
-                            });
-
-                    })
-                    .catch(function (error) {
-                        console.error('Failed to get ID token result:', error);
-                        alert("An error occurred while sending the message.");
-                    });
+                messagesRef.push({
+                    type: "text",
+                    content: text,
+                    sender: displayName,
+                    time: currentTime
+                }).then(() => {
+                    document.getElementById('inputBox').value = '';
+                }).catch(err => {
+                    console.error("Error sending message:", err);
+                    alert("Error sending message.");
+                });
             } else {
-                console.log('User is not signed in. Message submission not allowed.');
                 alert("Please sign in to send a message.");
             }
         }
 
-   function saveImage() {
-    var fileInput = document.getElementById('fileInput');
-    var file = fileInput.files[0];
-    var currentUser = firebase.auth().currentUser;
+        // Upload image/video
+        function saveMedia() {
+            var fileInput = document.getElementById('fileInput');
+            var file = fileInput.files[0];
+            var currentUser = firebase.auth().currentUser;
 
-    if (currentUser && file) {
-        currentUser.getIdTokenResult()
-            .then(function (idTokenResult) {
-                var displayName = idTokenResult.claims.name || 'Unknown User';
+            if (currentUser && file) {
+                var displayName = currentUser.displayName || 'Unknown User';
+                var storageRef = firebase.storage().ref('media/' + file.name);
 
-                var storageRef = firebase.storage().ref();
-                var imagesRef = storageRef.child('images/' + file.name);
+                storageRef.put(file).then(snapshot => {
+                    return snapshot.ref.getDownloadURL();
+                }).then(downloadURL => {
+                    var fileType = file.type.startsWith('video/') ? 'video' : 'image';
+                    var currentTime = new Date().toLocaleString();
 
-                imagesRef.put(file)
-                    .then(function (snapshot) {
-                        return snapshot.ref.getDownloadURL();
-                    })
-                    .then(function (downloadURL) {
-                        var messageString;
-
-                        if (file.type.startsWith('image/')) {
-                            // If it's an image file
-                            messageString = '[' + displayName + ']: [Image] ' + downloadURL;
-                        } else if (file.type.startsWith('video/')) {
-                            // If it's a video file
-                            messageString = '[' + displayName + ']: [Video] ' + downloadURL;
-                        } else {
-                            // Assume other file types are treated as regular files
-                            messageString = '[' + displayName + ']: [File] ' + downloadURL;
-                        }
-
-                        var newMessageRef = messagesRef.push();
-                        newMessageRef.set(messageString)
-                            .then(function () {
-                                document.getElementById('fileInput').value = '';
-                                displayLines();
-                            })
-                            .catch(function (error) {
-                                console.error('Failed to save image message:', error);
-                                alert("An error occurred while uploading the image.");
-                            });
-                    })
-                    .catch(function (error) {
-                        console.error('Failed to upload image:', error);
-                        alert("An error occurred while uploading the image.");
+                    return messagesRef.push({
+                        type: fileType,
+                        content: downloadURL,
+                        sender: displayName,
+                        time: currentTime
                     });
-            })
-            .catch(function (error) {
-                console.error('Failed to get ID token result:', error);
-                alert("An error occurred while uploading the image.");
-            });
-    } else {
-        console.log('User is not signed in or no file selected.');
-        alert("Please sign in and select a file to upload.");
-    }
-}
-
-
-
-
-function displayLines() {
-    // Clear the existing messages
-    var savedTextLines = document.getElementById('savedTextLines');
-    savedTextLines.innerHTML = '';
-
-    // Retrieve messages from Firebase
-    messagesRef.on('value', function (snapshot) {
-        snapshot.forEach(function (childSnapshot) {
-            var message = childSnapshot.val();
-            var lineElement = document.createElement('p');
-
-            // Check if the message contains an image URL
-            var imageUrl = extractImageUrl(message);
-            if (imageUrl) {
-                // If the message contains an image URL, create an img element
-                var imgElement = document.createElement('img');
-                imgElement.src = imageUrl;
-                imgElement.alt = 'Image';
-
-                // Append the img element to the line element
-                lineElement.appendChild(imgElement);
+                }).then(() => {
+                    fileInput.value = '';
+                }).catch(err => {
+                    console.error("Upload error:", err);
+                    alert("Error uploading file.");
+                });
             } else {
-                // If it's a regular text message, display it as text
-                var messageText = message;
-                var timeElement = document.createElement('span');
-                timeElement.classList.add('message-time'); // Add a class to style the time
+                alert("Please sign in and select a file.");
+            }
+        }
 
-                // Extract the time information from the message
-                var timeIndex = message.lastIndexOf('(');
-                if (timeIndex !== -1) {
-                    var timeInfo = message.substring(timeIndex);
-                    messageText = message.substring(0, timeIndex);
+        // Display messages
+        function displayMessages(snapshot) {
+            var savedTextLines = document.getElementById('savedTextLines');
+            savedTextLines.innerHTML = '';
 
-                    // Set the time information as the content of the time element
-                    timeElement.textContent = timeInfo;
+            snapshot.forEach(childSnapshot => {
+                var msg = childSnapshot.val();
+                var p = document.createElement('p');
 
-                    // Style the time element
-                    timeElement.style.fontSize = 'smaller'; // Smaller font size
-                    timeElement.style.color = 'gray'; // Different color
+                var content = `[${msg.sender}]: `;
+                if (msg.type === "text") {
+                    content += msg.content;
                 }
 
-                // Set the message text
-                lineElement.textContent = messageText;
+                p.textContent = content;
 
-                // Append the time element after the message text
-                lineElement.appendChild(timeElement);
-            }
+                var timeSpan = document.createElement('span');
+                timeSpan.textContent = ` (${msg.time || ''})`;
+                timeSpan.className = 'message-time';
+                p.appendChild(timeSpan);
 
-            // Append the line element to the savedTextLines div
-            savedTextLines.insertBefore(lineElement, savedTextLines.firstChild);
-        });
-    });
-}
+                if (msg.type === "image") {
+                    var img = document.createElement('img');
+                    img.src = msg.content;
+                    p.appendChild(img);
+                } else if (msg.type === "video") {
+                    var video = document.createElement('video');
+                    video.src = msg.content;
+                    video.controls = true;
+                    p.appendChild(video);
+                }
 
+                savedTextLines.insertBefore(p, savedTextLines.firstChild);
+            });
+        }
 
-
-
-        // Function to extract image URL from message
-    function extractImageUrl(message) {
-        var matches = message.match(/\[Image\]\s*(https?:\/\/[^\s]+)/);
-        return matches ? matches[1] : '';
-    }
-
-        firebase.auth().onAuthStateChanged(function (user) {
+        // Firebase auth state listener
+        firebase.auth().onAuthStateChanged(user => {
             updateUserAccount();
-
             if (user) {
-                displayLines();
+                messagesRef.on('value', displayMessages);
             }
         });
     </script>
-
-    <!-- User Account -->
-    <div id="userAccount"></div>
 </body>
 
 </html>
