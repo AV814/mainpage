@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Your Profile</title>
+  <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-storage.js"></script>
+  <script src="firebase-config.js"></script>
+</head>
+<body style="background-color:rgb(17, 17, 17); color:white; text-align:center;">
+
+  <h2>Your Profile</h2>
+  <div id="profileSection">
+    <p><strong>Email:</strong> <span id="email"></span></p>
+    <p><strong>Username:</strong> <span id="username"></span></p>
+    <p><strong>Avatar:</strong></p>
+    <img id="avatar" src="" alt="No Avatar" width="150" height="150" style="border-radius: 50%; border: 2px solid white;"><br><br>
+
+    <input type="file" id="avatarUpload" accept="image/*"><br><br>
+    <button onclick="uploadAvatar()">Upload New Avatar</button>
+  </div>
+
+  <script>
+    firebase.auth().onAuthStateChanged(function(user) {
+      if (user) {
+        document.getElementById("email").textContent = user.email;
+        document.getElementById("username").textContent = user.displayName || "Unknown User";
+
+        if (user.photoURL) {
+          document.getElementById("avatar").src = user.photoURL;
+        } else {
+          document.getElementById("avatar").alt = "No Avatar Set";
+        }
+      } else {
+        alert("You must be signed in to view this page.");
+        window.location.href = "sign-in.html";
+      }
+    });
+
+    function uploadAvatar() {
+      var user = firebase.auth().currentUser;
+      var file = document.getElementById("avatarUpload").files[0];
+
+      if (user && file) {
+        var storageRef = firebase.storage().ref("avatars/" + user.uid);
+        storageRef.put(file).then(function(snapshot) {
+          return snapshot.ref.getDownloadURL();
+        }).then(function(downloadURL) {
+          return user.updateProfile({ photoURL: downloadURL });
+        }).then(function() {
+          alert("Avatar updated successfully!");
+          location.reload(); // Reload to show updated avatar
+        }).catch(function(error) {
+          console.error("Error updating avatar:", error);
+          alert("Failed to upload avatar.");
+        });
+      } else {
+        alert("Please select a file first.");
+      }
+    }
+  </script>
+</body>
+</html>
