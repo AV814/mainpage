@@ -2,67 +2,66 @@
 <html>
 <head>
   <title>Your Profile</title>
-  <!-- Firebase SDK -->
-    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-storage.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-storage.js"></script>
   <script src="firebase-config.js"></script>
 </head>
-<body style="background-color:rgb(17, 17, 17); color:white; text-align:center;">
-
-  <h2>Your Profile</h2>
-  <div id="profileSection">
-    <p><strong>Email:</strong> <span id="email"></span></p>
-    <p><strong>Username:</strong> <span id="username"></span></p>
-    <p><strong>Avatar:</strong></p>
-    <img id="avatar" src="" alt="No Avatar" width="150" height="150" style="border-radius: 50%; border: 2px solid white;"><br><br>
-
-    <input type="file" id="avatarUpload" accept="image/*"><br><br>
-    <button onclick="uploadAvatar()">Upload New Avatar</button>
+<body style="background-color:rgb(22, 22, 22); color:white; font-family:sans-serif; text-align:center">
+  <h2>Your Account Info</h2>
+  <div id="userInfo">
+    <p><strong>Email:</strong> <span id="userEmail"></span></p>
+    <p><strong>Username:</strong> <span id="userDisplayName"></span></p>
+    <p><strong>Profile Picture:</strong></p>
+    <img id="userPhoto" src="" alt="Profile Picture" style="max-width: 150px; border-radius: 10px;">
   </div>
 
+  <hr>
+
+  <h3>Change Profile Picture</h3>
+  <input type="file" id="avatarInput" accept="image/*">
+  <button onclick="uploadAvatar()">Upload Avatar</button>
+
   <script>
+    // Wait for user to be authenticated
     firebase.auth().onAuthStateChanged(function(user) {
       if (user) {
-        document.getElementById("email").textContent = user.email;
-        document.getElementById("username").textContent = user.displayName || "Unknown User";
+        document.getElementById('userEmail').textContent = user.email || 'N/A';
+        document.getElementById('userDisplayName').textContent = user.displayName || 'Unknown User';
 
         if (user.photoURL) {
-          document.getElementById("avatar").src = user.photoURL;
+          document.getElementById('userPhoto').src = user.photoURL;
         } else {
-          document.getElementById("avatar").alt = "No Avatar Set";
+          document.getElementById('userPhoto').src = 'https://via.placeholder.com/150?text=No+Image';
         }
       } else {
-        alert("You must be signed in to view this page.");
-        window.location.href = "sign-in.html";
+        alert("You're not logged in!");
+        window.location.href = 'sign-in.html';
       }
     });
 
+    // Upload and set new avatar
     function uploadAvatar() {
+      var file = document.getElementById('avatarInput').files[0];
       var user = firebase.auth().currentUser;
-      var file = document.getElementById("avatarUpload").files[0];
 
       if (user && file) {
-        var storageRef = firebase.storage().ref("avatars/" + user.uid);
-        storageRef.put(file).then(function(snapshot) {
+        var storageRef = firebase.storage().ref('avatars/' + user.uid + '.jpg');
+        storageRef.put(file).then(snapshot => {
           return snapshot.ref.getDownloadURL();
-        }).then(function(downloadURL) {
+        }).then(downloadURL => {
           return user.updateProfile({ photoURL: downloadURL });
-        }).then(function() {
-          alert("Avatar updated successfully!");
-          location.reload(); // Reload to show updated avatar
-        }).catch(function(error) {
-          console.error("Error updating avatar:", error);
-          alert("Failed to upload avatar.");
+        }).then(() => {
+          document.getElementById('userPhoto').src = user.photoURL;
+          alert("Avatar updated!");
+        }).catch(error => {
+          console.error("Avatar upload failed:", error);
+          alert("Error uploading avatar.");
         });
       } else {
-        alert("Please select a file first.");
+        alert("Please select a file and make sure you're signed in.");
       }
     }
   </script>
 </body>
-  <footer>
-    Version 0.1
-  </footer>
 </html>
